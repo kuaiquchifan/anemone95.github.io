@@ -526,7 +526,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/saved.php?action=get&amp;name=anemone</span><br></pre></td></tr></table></figure>
 <p><img src="/xss-XSS类型、利用和防御/1550129511724.png" alt="1550129511724"></p>
 <h2 id="DOM型"><a href="#DOM型" class="headerlink" title="DOM型"></a>DOM型</h2><p>通过js操控dom引入xss代码：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">// http://127.0.0.1/dom.php?url=javascript:alert(/xss/)</span><br><span class="line">var url_search=document.location.search;</span><br><span class="line">var the_url = new URLSearchParams(url_search).get('url');</span><br><span class="line"><span class="xml">var markup='<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"'+the_url+'"</span>&gt;</span>Link<span class="tag">&lt;/<span class="name">a</span>&gt;</span>';</span></span><br><span class="line">document.write(markup);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript"><span class="comment">// http://127.0.0.1/dom.php?url=javascript:alert(/xss/)</span></span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> url_search=<span class="built_in">document</span>.location.search;</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> the_url = <span class="keyword">new</span> URLSearchParams(url_search).get(<span class="string">'url'</span>);</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> markup=<span class="string">'&lt;a href="'</span>+the_url+<span class="string">'"&gt;Link&lt;/a&gt;'</span>;</span></span><br><span class="line"><span class="javascript"><span class="built_in">document</span>.write(markup);</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p><img src="/xss-XSS类型、利用和防御/1550131058571.png" alt="1550131058571"></p>
 <p>出现场景：</p>
 <ul>
@@ -775,7 +775,7 @@
                     
                       
                     
-                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-count">25</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -908,7 +908,7 @@
                     
                       
                     
-                    <span class="site-state-item-count">59</span>
+                    <span class="site-state-item-count">60</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
