@@ -337,10 +337,10 @@
       
         <h1 id="获取类对象"><a href="#获取类对象" class="headerlink" title="获取类对象"></a>获取类对象</h1><h2 id="动态加载一个类"><a href="#动态加载一个类" class="headerlink" title="动态加载一个类"></a>动态加载一个类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">URL[] urls = <span class="keyword">new</span> URL[] &#123;<span class="keyword">new</span> URL(<span class="string">"file:.\\out\\production\\java_reflect"</span>)&#125;;</span><br><span class="line">URLClassLoader classLoader = <span class="keyword">new</span> URLClassLoader(urls);</span><br><span class="line">Class clazz = classLoader.loadClass(<span class="string">"test.reflect.User"</span>);</span><br></pre></td></tr></table></figure><a id="more"></a>
 <h2 id="寻找一个类"><a href="#寻找一个类" class="headerlink" title="寻找一个类"></a>寻找一个类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(<span class="string">"test.reflect.User"</span>);</span><br></pre></td></tr></table></figure>
-<h1 id="获取类中的构造方法"><a href="#获取类中的构造方法" class="headerlink" title="获取类中的构造方法"></a>获取类中的构造方法</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Constructor constructor1=clazz.getConstructor();</span><br><span class="line">User user1 = (User) constructor1.newInstance();</span><br><span class="line"></span><br><span class="line">Constructor constructor2=clazz.getConstructor(String.class, String.class);</span><br><span class="line">User user2 = (User) constructor2.newInstance(<span class="string">"lili"</span>, <span class="string">"123456"</span>);</span><br></pre></td></tr></table></figure>
+<h1 id="获取类中的构造方法"><a href="#获取类中的构造方法" class="headerlink" title="获取类中的构造方法"></a>获取类中的构造方法</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Constructor constructor1=clazz.getConstructor();</span><br><span class="line">User user1 = (User) constructor1.newInstance();</span><br><span class="line"></span><br><span class="line">Constructor constructor2=clazz.getConstructor(String<span class="class">.<span class="keyword">class</span>, <span class="title">String</span>.<span class="title">class</span>)</span>;</span><br><span class="line">User user2 = (User) constructor2.newInstance(<span class="string">"lili"</span>, <span class="string">"123456"</span>);</span><br></pre></td></tr></table></figure>
 <h1 id="获取类中属性"><a href="#获取类中属性" class="headerlink" title="获取类中属性"></a>获取类中属性</h1><h2 id="获取类中公有属性"><a href="#获取类中公有属性" class="headerlink" title="获取类中公有属性"></a>获取类中公有属性</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Field usernameField=clazz.getField(<span class="string">"username"</span>);</span><br><span class="line">usernameField.get(user2);</span><br></pre></td></tr></table></figure>
 <h2 id="获取类中私有属性"><a href="#获取类中私有属性" class="headerlink" title="获取类中私有属性"></a>获取类中私有属性</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Field passwordField=clazz.getDeclaredField(<span class="string">"password"</span>);</span><br><span class="line">passwordField.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">passwordField.set(user2, <span class="string">"654321"</span>);</span><br></pre></td></tr></table></figure>
-<h1 id="获取类中方法"><a href="#获取类中方法" class="headerlink" title="获取类中方法"></a>获取类中方法</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Method getInfoMethod=clazz.getDeclaredMethod(<span class="string">"getInfo"</span>, <span class="keyword">int</span>.class);</span><br></pre></td></tr></table></figure>
+<h1 id="获取类中方法"><a href="#获取类中方法" class="headerlink" title="获取类中方法"></a>获取类中方法</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Method getInfoMethod=clazz.getDeclaredMethod(<span class="string">"getInfo"</span>, <span class="keyword">int</span><span class="class">.<span class="keyword">class</span>)</span>;</span><br></pre></td></tr></table></figure>
 <h2 id="调用方法"><a href="#调用方法" class="headerlink" title="调用方法"></a>调用方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">getInfoMethod.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">String ret= (String) getInfoMethod.invoke(user2, <span class="number">1</span>);</span><br><span class="line">System.out.println(ret);</span><br></pre></td></tr></table></figure>
 <h2 id="调用静态方法"><a href="#调用静态方法" class="headerlink" title="调用静态方法"></a>调用静态方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Method staticMethod=clazz.getDeclaredMethod(<span class="string">"staticMethod"</span>);</span><br><span class="line">staticMethod.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">staticMethod.invoke(<span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
 
@@ -469,7 +469,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -482,7 +482,7 @@
             <a href="/categories/">
           
         
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -495,7 +495,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-count">68</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

