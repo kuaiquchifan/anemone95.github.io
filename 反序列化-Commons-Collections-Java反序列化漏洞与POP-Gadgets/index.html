@@ -16,6 +16,7 @@
   <link rel="mask-icon" href="/images/avatar.svg?v=7.4.0" color="#222">
   <link rel="alternate" href="/atom.xml" title="Anemone's Blog" type="application/atom+xml">
   <meta name="google-site-verification" content="Re5JdegRYzNFco-rC9lYIsvSWIgh5JvyfhuEaZCeFCk">
+  <meta name="baidu-site-verification" content="RPPKLBQyoc">
 
 <link rel="stylesheet" href="/css/main.css?v=7.4.0">
 
@@ -58,7 +59,7 @@
 </script>
 
   <meta name="description" content="利用Commons Collections攻击反序列化漏洞由FoxGlove Security团队首次提出，也是我们第一次看到反序列化类型漏洞的利用，而其整个利用过程后来也被成为面向属性编程（POP），虽然事隔久远，但是还是参考先前大佬们的研究学习一下。Apache Commons Collections">
-<meta name="keywords" content="Web安全,反序列化,Java">
+<meta name="keywords" content="Web安全,Java,反序列化">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java反序列化2：Commons Collections Java反序列化漏洞与POP Gadgets">
 <meta property="og:url" content="http://anemone.top/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/index.html">
@@ -386,7 +387,7 @@
 <h1 id="JBoss"><a href="#JBoss" class="headerlink" title="JBoss"></a>JBoss</h1><p>下面找一个不安全的反序列化入口吧，一般Java的RMI（远程方法调用）或是其他服务都不免用到反序列化。在org.jboss.invocation.http.servlet.ReadOnlyAccessFilter.doFilter(ReadOnlyAccessFilter.java:106)就存在一个不安全的反序列化入口：</p>
 <p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546160655463.png" alt="1546160655463"></p>
 <p>在JBoss网站<a href="http://jbossas.jboss.org/downloads/上下载一个存在漏洞的jboss（以版本6.1为例），在虚拟机中安装一个低版本的java（8u66)，再运行jboss" target="_blank" rel="noopener">http://jbossas.jboss.org/downloads/上下载一个存在漏洞的jboss（以版本6.1为例），在虚拟机中安装一个低版本的java（8u66)，再运行jboss</a></p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\anemone\Desktop\jboss-<span class="number">6.1</span>.<span class="number">0</span>.Final\bin&gt; ./run.bat -b <span class="number">0.0</span>.<span class="number">0.0</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\anemone\Desktop\jboss<span class="literal">-6</span>.<span class="number">1.0</span>.Final\bin&gt; ./run.bat <span class="literal">-b</span> <span class="number">0.0</span>.<span class="number">0.0</span></span><br></pre></td></tr></table></figure>
 <p><img src="/反序列化-Commons-Collections-Java反序列化漏洞与POP-Gadgets/1546173400906.png" alt="1546173400906"></p>
 <p>接着尝试触发Payload，这里假设server地址为192.168.80.141：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">λ curl http://192.168.80.141:8080/invoker/<span class="built_in">readonly</span> --data-binary @payload.ser</span><br></pre></td></tr></table></figure>
@@ -460,9 +461,9 @@
             
               <a href="/tags/Web安全/" rel="tag"># Web安全</a>
             
-              <a href="/tags/反序列化/" rel="tag"># 反序列化</a>
-            
               <a href="/tags/Java/" rel="tag"># Java</a>
+            
+              <a href="/tags/反序列化/" rel="tag"># 反序列化</a>
             
           </div>
         
@@ -637,7 +638,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>
