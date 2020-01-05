@@ -16,7 +16,7 @@
   <link rel="mask-icon" href="/images/avatar.svg?v=7.4.0" color="#222">
   <link rel="alternate" href="/atom.xml" title="Anemone's Blog" type="application/atom+xml">
   <meta name="google-site-verification" content="Re5JdegRYzNFco-rC9lYIsvSWIgh5JvyfhuEaZCeFCk">
-  <meta name="baidu-site-verification" content="RPPKLBQyoc">
+  <meta name="baidu-site-verification" content="opTC8YN3Pn">
 
 <link rel="stylesheet" href="/css/main.css?v=7.4.0">
 
@@ -257,7 +257,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://anemone.top/ctf-2018“安恒杯”WEB安全测试秋季资格赛wp/">
+    <link itemprop="mainEntityOfPage" href="http://anemone.top/ctf-2018安恒9月赛babybypass复现-无字母数字的webshell思考/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Anemone">
@@ -271,7 +271,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
             
-            <a href="/ctf-2018“安恒杯”WEB安全测试秋季资格赛wp/" class="post-title-link" itemprop="url">2018“安恒杯”WEB安全测试秋季资格赛wp</a>
+            <a href="/ctf-2018安恒9月赛babybypass复现-无字母数字的webshell思考/" class="post-title-link" itemprop="url">2018安恒9月赛babybypass复现&无字母数字的webshell思考</a>
           
         </h2>
 
@@ -316,7 +316,7 @@
           
 
           
-            <span id="/ctf-2018“安恒杯”WEB安全测试秋季资格赛wp/" class="post-meta-item leancloud_visitors" data-flag-title="2018“安恒杯”WEB安全测试秋季资格赛wp" title="阅读次数">
+            <span id="/ctf-2018安恒9月赛babybypass复现-无字母数字的webshell思考/" class="post-meta-item leancloud_visitors" data-flag-title="2018安恒9月赛babybypass复现&无字母数字的webshell思考" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -334,11 +334,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>2018“安恒杯”WEB安全测试秋季资格赛，被老板批评“只会写文档的黑客”后，赶快刷几题找回点自信Orz。</p><h1 id="奇怪的恐龙特性"><a href="#奇怪的恐龙特性" class="headerlink" title="奇怪的恐龙特性"></a>奇怪的恐龙特性</h1><p>进入靶机，可以看到网页源码</p><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">highlight_file(<span class="keyword">__FILE__</span>); </span><br><span class="line">ini_set(<span class="string">"display_error"</span>, <span class="keyword">false</span>);  </span><br><span class="line">error_reporting(<span class="number">0</span>);  </span><br><span class="line">$str = <span class="keyword">isset</span>($_GET[<span class="string">'A_A'</span>])?$_GET[<span class="string">'A_A'</span>]:<span class="string">'A_A'</span>; </span><br><span class="line"><span class="keyword">if</span> (strpos($_SERVER[<span class="string">'QUERY_STRING'</span>], <span class="string">"A_A"</span>) !==<span class="keyword">false</span>) &#123; </span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'A_A,have fun'</span>; </span><br><span class="line">&#125; </span><br><span class="line"><span class="keyword">elseif</span> ($str&lt;<span class="number">9999999999</span>) &#123; </span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'A_A,too small'</span>; </span><br><span class="line">&#125; </span><br><span class="line"><span class="keyword">elseif</span> ((string)$str&gt;<span class="number">0</span>) &#123; </span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'A_A,too big'</span>; </span><br><span class="line">&#125; </span><br><span class="line"><span class="keyword">else</span>&#123; </span><br><span class="line">    <span class="keyword">echo</span> file_get_contents(<span class="string">'flag.php'</span>); </span><br><span class="line">     </span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"> <span class="meta">?&gt;</span> A_A,too small</span><br></pre></td></tr></table></figure>
+          <p>一开始看这题满脑子想的都是用异或来做，结果发现没办法调用getflag函数，看了别人的wp才发现思路错了。</p><h1 id="错误思路"><a href="#错误思路" class="headerlink" title="错误思路"></a>错误思路</h1><p>毕竟这个思路也蛮清奇，大概说一下吧：</p><p>思考这一个题目</p><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">'code'</span>]))&#123;</span><br><span class="line">    $code = $_GET[<span class="string">'code'</span>];</span><br><span class="line">    <span class="keyword">if</span>(strlen($code)&gt;<span class="number">135</span>)&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"Long."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(preg_match(<span class="string">"/[A-Za-z0-9]+/"</span>,$code))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"NO."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">eval</span>($code);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    highlight_file(<span class="keyword">__FILE__</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getFlag</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"Flag"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
             <div class="post-button">
-              <a class="btn" href="/ctf-2018“安恒杯”WEB安全测试秋季资格赛wp/#more" rel="contents">
+              <a class="btn" href="/ctf-2018安恒9月赛babybypass复现-无字母数字的webshell思考/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
