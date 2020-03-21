@@ -380,7 +380,7 @@
 <script type="math/tex; mode=display">
 x\mapsto y * y\mapsto x</script><p>$x \mapsto y$ 指指针x指向值y（x points to y），$A*B$指A和B处于分离的两块内存中（and separately），因此以上公式被叫做（x 指向y，同时y指向x），可以用下图表示：</p>
 <p><img src="/whitebox-infer/SepSplit.jpg" alt="static/images/SepSplit.jpg"></p>
-<p>接着使用Hoare三元组${pre}prog{post}$，表示程序行为，$pre$指前置条件，$prog$指程序片段$post$为后置条件。例如使用Hoare三元组描述一个关闭资源的函数：</p>
+<p>接着使用Hoare三元组$\{pre\}prog\{post\}$，表示程序行为，$pre$指前置条件，$prog$指程序片段$post$为后置条件。例如使用Hoare三元组描述一个关闭资源的函数：</p>
 <script type="math/tex; mode=display">
 \{r\mapsto open\}closeResource(r)\{r\mapsto closed\}(spec)</script><p>它说明，一个正确的关闭资源的函数运行前，r资源应该是打开的，运行后r资源应该是关闭的，如果不符合则代码有问题。</p>
 <p>那么若有两个资源$r_1$和$r_2$仅关闭$r_1$可以表示成：</p>
@@ -544,7 +544,7 @@ x\mapsto0 *z \mapsto 0 * ?antiframe \vdash x\mapsto list * y \mapsto list * ?fra
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -557,7 +557,7 @@ x\mapsto0 *z \mapsto 0 * ?antiframe \vdash x\mapsto list * y \mapsto list * ?fra
             <a href="/categories/">
           
         
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -570,7 +570,7 @@ x\mapsto0 *z \mapsto 0 * ?antiframe \vdash x\mapsto list * y \mapsto list * ?fra
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">68</span>
+        <span class="site-state-item-count">70</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
