@@ -59,7 +59,7 @@
 </script>
 
   <meta name="description" content="原理shiro1.2.5后秘钥不再硬编码，但是采用CBC加密会产生padding  oracle攻击，又因为java序列化结构体后可以加垃圾字符，所以攻击能够成功解密时的调用链1234567891011121314org.apache.shiro.mgt.AbstractRememberMeManager#convertBytesToPrincipals // 不论哪个异常都会返回null，上层3">
-<meta name="keywords" content="Web安全,Java,反序列化,漏洞分析,Shiro">
+<meta name="keywords" content="Web安全,反序列化,Java,Shiro,漏洞分析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Shiro v1.4.0反序列化">
 <meta property="og:url" content="http://anemone.top/vulnresearch-Shrio1.4.0PaddingOracle导致反序列化/index.html">
@@ -401,13 +401,13 @@
             
               <a href="/tags/Web安全/" rel="tag"># Web安全</a>
             
-              <a href="/tags/Java/" rel="tag"># Java</a>
-            
               <a href="/tags/反序列化/" rel="tag"># 反序列化</a>
             
-              <a href="/tags/漏洞分析/" rel="tag"># 漏洞分析</a>
+              <a href="/tags/Java/" rel="tag"># Java</a>
             
               <a href="/tags/Shiro/" rel="tag"># Shiro</a>
+            
+              <a href="/tags/漏洞分析/" rel="tag"># 漏洞分析</a>
             
           </div>
         
@@ -500,7 +500,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-count">53</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
