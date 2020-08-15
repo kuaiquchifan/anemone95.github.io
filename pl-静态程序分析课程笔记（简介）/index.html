@@ -70,7 +70,7 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（简介）/image-20200802115612020.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（简介）/image-20200802154058197.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（简介）/image-20200802154239519.png">
-<meta property="og:updated_time" content="2020-08-02T09:23:27.257Z">
+<meta property="og:updated_time" content="2020-08-15T09:46:31.427Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（简介）">
 <meta name="twitter:description" content="母校计算机院的李樾、谭添老师讲的课，听了第一节课就哭了，决定做一下笔记，课程网站 https://pascal-group.bitbucket.io/teaching.html。PL知识体系如上图所示，主要分三大块，理论部分包含语言设计、类型系统、语义和逻辑检查；环境部分包含编译器和运行时设计等；应用部分包含程序分析、程序验证和程序生成等，本课程主要关注于应用方面的程序分析。">
@@ -293,11 +293,19 @@
                 
               
 
-              <time title="创建时间：2020-08-02 16:34:13 / 修改时间：17:23:27" itemprop="dateCreated datePublished" datetime="2020-08-02T16:34:13+08:00">2020-08-02</time>
+              <time title="创建时间：2020-08-02 16:34:13" itemprop="dateCreated datePublished" datetime="2020-08-02T16:34:13+08:00">2020-08-02</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-15 17:46:31" itemprop="dateModified" datetime="2020-08-15T17:46:31+08:00">2020-08-15</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -570,7 +578,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-count">60</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -838,6 +846,56 @@ if (document.querySelectorAll('pre.mermaid').length) {
 
   
 
+  
+    
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
   
 
   
