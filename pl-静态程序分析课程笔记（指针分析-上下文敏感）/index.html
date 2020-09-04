@@ -81,7 +81,7 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213557030.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903204348536.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903205546848.png">
-<meta property="og:updated_time" content="2020-09-03T13:03:01.592Z">
+<meta property="og:updated_time" content="2020-09-04T12:12:40.146Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Anemone&#39;s Blog">
 <meta name="twitter:description" content="IntroductionProblem of Context-Insensitive (C.I.) 每次函数调用时，调用的上下文不一样； 在不同的调用上下文里，函数内的变量会指向不同； 在上下文不敏感的指针分析中，函数内的对象指向的内容是不同上下文混合起来的（如上例中 $n$ 指向 $o_1$ 和 $o_2$），而这些内容会后向传播，造成更多不准确的结果。">
@@ -304,7 +304,7 @@
                 
               
 
-              <time title="创建时间：2020-09-03 21:03:01" itemprop="dateCreated datePublished" datetime="2020-09-03T21:03:01+08:00">2020-09-03</time>
+              <time title="创建时间：2020-09-04 20:12:40" itemprop="dateCreated datePublished" datetime="2020-09-04T20:12:40+08:00">2020-09-04</time>
             </span>
           
 
@@ -567,6 +567,7 @@ _c("[]:c → {o3}")
 <h2 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h2><p>在李樾、谭添老师的论文[4]中，对比了三者的效率和精度，may-fail-cast 指强制转换出错的次数，精度越高出错次数会越少，call-graph-edge 指产生的调用图边数，精度越高边越少。</p>
 <p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903205546848.png" alt="image-20200903205546848"></p>
 <p>可以看出，从准确率角度，对象敏感最准确；从效率角度，类型敏感效率最高，而对于面向对象的 Java 语言，call-site效果最差。</p>
+<p>顺带一提的是，论文[4]中介绍了一种新算法，因为程序分析在大多时候不需要上下文敏感，因此只在需要上下文敏感处使用准确的Object分析，就可以既保证精度又有足够的速度。</p>
 <h1 id="Propagate-AddEdge-and-Dispatch"><a href="#Propagate-AddEdge-and-Dispatch" class="headerlink" title="Propagate(), AddEdge() and Dispatch()"></a>Propagate(), AddEdge() and Dispatch()</h1><p>Propagate():</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Propagate</span><span class="params">(n, pts)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    n: 指针n</span></span><br><span class="line"><span class="string">    pts: n可能指向的新的指针集合</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> pts <span class="keyword">is</span> <span class="keyword">not</span> empty:</span><br><span class="line">        pt(n) ⋃= pts <span class="comment"># 将pts内容存入到指针指向的集合中</span></span><br><span class="line">        <span class="keyword">for</span> each n → s ∈ PFG</span><br><span class="line">            add s, pts to WL</span><br></pre></td></tr></table></figure>
 <p>AddEdge():</p>
