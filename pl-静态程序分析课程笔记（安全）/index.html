@@ -58,13 +58,13 @@
   };
 </script>
 
-  <meta name="description" content="Incection和info leak在软件安全中，最常见的漏洞有注入类漏洞（Injection）和信息泄露（Information Leak），而本节课将介绍的Information Flow 分析方法可以有效处理以上漏洞，具体来说，就是我们常用的污点分析技术。">
+  <meta name="description" content="在软件安全中，最常见的漏洞有注入类漏洞（Injection）和信息泄露（Information Leak），而本节课将介绍的Information Flow 分析方法可以有效处理以上漏洞，具体来说，就是我们常用的污点分析技术。Information Flow Security">
 <meta name="keywords" content="白盒扫描,静态程序分析,污点分析,Information flow">
 <meta property="og:type" content="article">
 <meta property="og:title" content="静态程序分析课程笔记（安全）">
 <meta property="og:url" content="http://anemone.top/pl-静态程序分析课程笔记（安全）/index.html">
 <meta property="og:site_name" content="Anemone&#39;s Blog">
-<meta property="og:description" content="Incection和info leak在软件安全中，最常见的漏洞有注入类漏洞（Injection）和信息泄露（Information Leak），而本节课将介绍的Information Flow 分析方法可以有效处理以上漏洞，具体来说，就是我们常用的污点分析技术。">
+<meta property="og:description" content="在软件安全中，最常见的漏洞有注入类漏洞（Injection）和信息泄露（Information Leak），而本节课将介绍的Information Flow 分析方法可以有效处理以上漏洞，具体来说，就是我们常用的污点分析技术。Information Flow Security">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（安全）/image-20200905193021433.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（安全）/image-20200905194503470.png">
@@ -73,10 +73,10 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（安全）/image-20200905204756009.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（安全）/image-20200905205129601.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（安全）/image-20200905205353856.png">
-<meta property="og:updated_time" content="2020-09-05T12:56:37.836Z">
+<meta property="og:updated_time" content="2020-09-05T13:33:09.751Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（安全）">
-<meta name="twitter:description" content="Incection和info leak在软件安全中，最常见的漏洞有注入类漏洞（Injection）和信息泄露（Information Leak），而本节课将介绍的Information Flow 分析方法可以有效处理以上漏洞，具体来说，就是我们常用的污点分析技术。">
+<meta name="twitter:description" content="在软件安全中，最常见的漏洞有注入类漏洞（Injection）和信息泄露（Information Leak），而本节课将介绍的Information Flow 分析方法可以有效处理以上漏洞，具体来说，就是我们常用的污点分析技术。Information Flow Security">
 <meta name="twitter:image" content="http://anemone.top/pl-静态程序分析课程笔记（安全）/image-20200905193021433.png">
   <link rel="canonical" href="http://anemone.top/pl-静态程序分析课程笔记（安全）/">
 
@@ -296,7 +296,7 @@
                 
               
 
-              <time title="创建时间：2020-09-05 21:22:13 / 修改时间：20:56:37" itemprop="dateCreated datePublished" datetime="2020-09-05T21:22:13+08:00">2020-09-05</time>
+              <time title="创建时间：2020-09-05 21:22:13 / 修改时间：21:33:09" itemprop="dateCreated datePublished" datetime="2020-09-05T21:22:13+08:00">2020-09-05</time>
             </span>
           
             
@@ -336,9 +336,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>Incection和info leak</p><p>在软件安全中，最常见的漏洞有注入类漏洞（Injection）和信息泄露（Information Leak），而本节课将介绍的Information Flow 分析方法可以有效处理以上漏洞，具体来说，就是我们常用的污点分析技术。</p><a id="more"></a>
-
-<h1 id="Information-Flow-Security"><a href="#Information-Flow-Security" class="headerlink" title="Information Flow Security"></a>Information Flow Security</h1><h2 id="Information-Flow"><a href="#Information-Flow" class="headerlink" title="Information Flow"></a>Information Flow</h2><blockquote>
+        <p>在软件安全中，最常见的漏洞有注入类漏洞（Injection）和信息泄露（Information Leak），而本节课将介绍的Information Flow 分析方法可以有效处理以上漏洞，具体来说，就是我们常用的污点分析技术。</p><h1 id="Information-Flow-Security"><a href="#Information-Flow-Security" class="headerlink" title="Information Flow Security"></a>Information Flow Security</h1><a id="more"></a>
+<h2 id="Information-Flow"><a href="#Information-Flow" class="headerlink" title="Information Flow"></a>Information Flow</h2><blockquote>
 <p>Information flow: if the information in variable x is transferred to variable y, then there is information flow x → y. </p>
 </blockquote>
 <p>信息流[1] 指程序中的变量信息的流动，如有语句<code>y = x</code>，那么存在信息流 $x\rightarrow y$，可以看出，信息流分析很像先前的指针分析。</p>
