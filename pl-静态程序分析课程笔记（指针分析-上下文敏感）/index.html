@@ -82,7 +82,7 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213557030.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903204348536.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903205546848.png">
-<meta property="og:updated_time" content="2020-09-05T13:10:11.473Z">
+<meta property="og:updated_time" content="2020-09-09T13:16:42.627Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（指针分析-上下文敏感）">
 <meta name="twitter:description" content="IntroductionProblem of Context-Insensitive (C.I.) 每次函数调用时，调用的上下文不一样； 在不同的调用上下文里，函数内的变量会指向不同； 在上下文不敏感的指针分析中，函数内的对象指向的内容是不同上下文混合起来的（如上例中 $n$ 指向 $o_1$ 和 $o_2$），而这些内容会后向传播，造成更多不准确的结果。">
@@ -316,7 +316,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-05 21:10:11" itemprop="dateModified" datetime="2020-09-05T21:10:11+08:00">2020-09-05</time>
+                <time title="修改时间：2020-09-09 21:16:42" itemprop="dateModified" datetime="2020-09-09T21:16:42+08:00">2020-09-09</time>
               </span>
             
           
@@ -358,8 +358,7 @@
 <li>在不同的调用上下文里，函数内的变量会指向不同；</li>
 <li>在上下文不敏感的指针分析中，函数内的对象指向的内容是不同上下文混合起来的（如上例中 $n$ 指向 $o_1$ 和 $o_2$），而这些内容会后向传播，造成更多不准确的结果。</li>
 </ul><a id="more"></a>
-<p>具体如下图所示：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200829210207900.png" alt="image-20200829210207900"></p>
+<p>具体如下图所示：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200829210207900.png" alt="image-20200829210207900"></p>
 <p>当分析到<code>int i = x.get()</code> 时，上下文不敏感指针分析会认为 $x$ 指向 $o_1,o_2$，因此做常量分析时，$i$ 的分析结果就是 NAC，这当然是不准确的。</p>
 <h2 id="Context-Sensitivity-C-S"><a href="#Context-Sensitivity-C-S" class="headerlink" title="Context Sensitivity(C.S.)"></a>Context Sensitivity(C.S.)</h2><blockquote>
 <p>Context sensitivity models calling contexts by distinguishing different data flows of different contexts to improve precision.</p>
@@ -372,43 +371,29 @@
 <blockquote>
 <p>In cloning-based context-sensitive pointer analysis, each method is qualified by one or more contexts.</p>
 </blockquote>
-<p>注意，对每个函数的克隆本质是对函数内变量的克隆，如下图所示：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200830103742490.png" alt="image-20200830103742490"></p>
+<p>注意，对每个函数的克隆本质是对函数内变量的克隆，如下图所示：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200830103742490.png" alt="image-20200830103742490"></p>
 <p>对于<code>id()</code>函数内变量 <code>n</code> 来说，在第一行和第二行调用时，分别克隆出<code>[1]:n</code>和<code>[2]:n</code>个变量</p>
 <h2 id="Context-Sensitive-Heap"><a href="#Context-Sensitive-Heap" class="headerlink" title="Context-Sensitive Heap"></a>Context-Sensitive Heap</h2><p>对于OO语言，不仅变量有上下文，对象实例也需要有上下文，即需要做堆抽象（对象存储在堆区）。</p>
 <p>如下图，对<code>n</code>做上下文敏感分析：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/Inkedimage-20200830104632305_LI.jpg" alt="image-20200830104632305"><br>在变量上下文敏感，堆不敏感时（左侧），在<code>newX(Number)</code>中x没有上下文，恒指向$o_8$，那么在第三行第四行调用时， $o_8.f$ 存在 $o_1, o_2$两种可能，因此n也有两种可能，分析结果不准确。</p>
 <p>而堆敏感时（右侧），<code>newX(Number)</code>中存在上下文，即对于第三行第四行调用，产生不同上下文的x——$3:o_8$ 和$4:o_8$，它们分别指向$o_1$和$o_2$，因此n的分析时准确的。</p>
 <p>注意，一般变量和堆敏感通常是同时使用的，缺一不可。</p>
 <h1 id="Context-Sensitive-Pointer-Analysis-Rules"><a href="#Context-Sensitive-Pointer-Analysis-Rules" class="headerlink" title="Context Sensitive Pointer Analysis: Rules"></a>Context Sensitive Pointer Analysis: Rules</h1><h2 id="Domain"><a href="#Domain" class="headerlink" title="Domain"></a>Domain</h2><ul>
-<li><p>上下文（Context）</p>
-<script type="math/tex; mode=display">
-  c, c',c'' \in C</script><p>  C指所有上下文集合，根据不同的上下文抽象策略，c的表示内容不同，对于<strong>call-site sensitivity</strong>，而言，c为call-site的序列（callsite这里可用行号表示）；</p>
+<li><p>上下文（Context）：$ c, c’,c’’ \in C $<br>C指所有上下文集合，根据不同的上下文抽象策略，c的表示内容不同，对于<strong>call-site sensitivity</strong>，而言，c为call-site的序列（callsite这里可用行号表示）；</p>
 </li>
-<li><p>上下文敏感方法（Context-sensitive methods）</p>
-<script type="math/tex; mode=display">
-  c:m \in C \times M</script><p>  上下文方法表示为 $c:m$，属于 $C$ 和 $M$的笛卡尔积；</p>
+<li><p>上下文敏感方法（Context-sensitive methods）：$ c:m \in C \times M $<br>上下文方法表示为 $c:m$，属于 $C$ 和 $M$的笛卡尔积；</p>
 </li>
-<li><p>上下文敏感变量（Context-sensitive variables）</p>
-<script type="math/tex; mode=display">
-  c:x, c':y \in C \times V</script><p>  与上下文方法类似，$c:x$ 表示在上下文 $c$ 下变量 $x$ 的指向；</p>
+<li><p>上下文敏感变量（Context-sensitive variables）：$ c:x, c’:y \in C \times V $<br>与上下文方法类似，$c:x$ 表示在上下文 $c$ 下变量 $x$ 的指向；</p>
 </li>
-<li><p>上下文敏感对象（Context-sensitive methods）：</p>
-<script type="math/tex; mode=display">
-  c:o_i, c':o_j \in C \times O</script></li>
-<li><p>域（Fields）</p>
-<script type="math/tex; mode=display">
-  f,g \in F</script><p>  因为域依附于对象，而对象实例存在上下文，因此域实际也存在了上下文；</p>
+<li><p>上下文敏感对象（Context-sensitive methods）：$ c:o_i, c’:o_j \in C \times O $</p>
 </li>
-<li><p>对象实例域（Instance fields）</p>
-<script type="math/tex; mode=display">
-c: o_{i} \cdot f, c^{\prime}: o_{j} \cdot g \in \mathrm{C} \times \mathrm{O} \times \mathrm{F}</script></li>
-<li><p>上下文敏感指针（Context-sensitive pointers）</p>
-<script type="math/tex; mode=display">
-CSPointer=(C\times V) \cup (C \times O \times F)</script><p>上下文敏感指针属于上下文变量和实例域的并集；</p>
+<li><p>域（Fields），$ f,g \in F $<br>因为域依附于对象，而对象实例存在上下文，因此域实际也存在了上下文；</p>
 </li>
-<li><p>指向关系（Points-to relations）</p>
-<script type="math/tex; mode=display">
-  pt: CSPointer \rightarrow\mathcal{P}(C\times O)</script></li>
+<li><p>对象实例域（Instance fields）：$ c: o_{i} \cdot f, c^{\prime}: o_{j} \cdot g \in \mathrm{C} \times \mathrm{O} \times \mathrm{F} $</p>
+</li>
+<li><p>上下文敏感指针（Context-sensitive pointers）：$ CSPointer=(C\times V) \cup (C \times O \times F) $<br>上下文敏感指针属于上下文变量和实例域的并集；</p>
+</li>
+<li><p>指向关系（Points-to relations）：$pt: CSPointer \rightarrow\mathcal{P}(C\times O)$</p>
+</li>
 </ul>
 <h2 id="Rules"><a href="#Rules" class="headerlink" title="Rules"></a>Rules</h2><ul>
 <li><p>New，<code>i: x = new T()</code>，</p>
@@ -492,8 +477,7 @@ Select(\boldsymbol{c},\boldsymbol{l},\_)=[l',\dots,l'',l]\\
 </ul>
 <p>可以看出，$k$ 的值越长效果越准确，但是效率越低。</p>
 <h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>如下图所示，蓝底代码为待分析代码，注意代码中没有store和load语句因此不需要看这两个语句的处理，并且不考虑heap sensitive：</p>
-<p>初始化阶段，<strong>处理<code>main()</code>函数：</strong></p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902201538441.png" alt="image-20200902201538441" style="zoom:60%;"></p>
+<p>初始化阶段，<strong>处理<code>main()</code>函数：</strong><br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902201538441.png" alt="image-20200902201538441" style="zoom:60%;"></p>
 <p>将 $[]:C.main()$ 加入 RM 集合，因为函数存在new语句，将$\langle []:c, \{o_3\}\rangle$ 加入WL；</p>
 <p>循环处理WL，<strong>处理$\langle []:c, \{o_3\}\rangle$</strong>：</p>
 <ul>
@@ -535,11 +519,12 @@ _c("[]:c → {o3}")
 <li>$select()$给出$c^t=[14]$</li>
 </ul>
 </li>
-<li>添加$\langle [14]:m_{this}, \{o_3\}\rangle$至$WL$<ul>
+<li><p>添加$\langle [14]:m_{this}, \{o_3\}\rangle$至$WL$</p>
+<ul>
 <li>CG中接入调用边 $[4]:14\rightarrow[14]:C.id(Number)$ </li>
 </ul>
 </li>
-<li><p>执行$AddReachable([]:C.m())$</p>
+<li><p>执行$AddReachable([]:C.m())$  </p>
 <ul>
 <li>$[14]:C.id(Number)$加入$RM$</li>
 <li>添加参数边至 $PFG$</li>
@@ -569,29 +554,23 @@ _c("[]:c → {o3}")
 
 </li>
 </ul>
-<p>后续分析较为简单，不再记录，最终结果为：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902212048049.png" alt="image-20200902212048049"></p>
+<p>后续分析较为简单，不再记录，最终结果为：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902212048049.png" alt="image-20200902212048049"></p>
 <h2 id="Object-Sensitivity"><a href="#Object-Sensitivity" class="headerlink" title="Object Sensitivity"></a>Object Sensitivity</h2><p>对象敏感[2]的上下文由调用者对象和先前上下文组成：</p>
 <script type="math/tex; mode=display">
 \begin{array}{c}
 \operatorname{Select}\left(\_,\_, \boldsymbol{c}^{\prime}: \boldsymbol{o}_{\boldsymbol{i}}\right)=\left[o_{j}, \ldots, o_{k}, o_{i}\right] \\
 \text { where } c^{\prime}=\left[o_{j}, \ldots, o_{k}\right]
-\end{array}</script><p>举例来说：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213056427.png" alt="image-20200902213056427"></p>
+\end{array}</script><p>举例来说：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213056427.png" alt="image-20200902213056427"></p>
 <p>对于第5行代码调用后，1-object的上下文解析为$[o_1]$，可见对于第 7 行的指针分析而言，1-object效果优于1-call-site；</p>
-<p>从调用图也可看出分别：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213307436.png" alt="image-20200902213307436"></p>
-<p>Object Sensitivity理论上并不优于Call Site，如先前例子Object弱于Call Site：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213557030.png" alt="image-20200902213557030"></p>
+<p>从调用图也可看出分别：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213307436.png" alt="image-20200902213307436"></p>
+<p>Object Sensitivity理论上并不优于Call Site，如先前例子Object弱于Call Site：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213557030.png" alt="image-20200902213557030"></p>
 <h2 id="Type-Sensitivity"><a href="#Type-Sensitivity" class="headerlink" title="Type Sensitivity"></a>Type Sensitivity</h2><p>类型敏感[3]的上下文由调用点类和先前上下文组成：</p>
 <script type="math/tex; mode=display">
 \operatorname{Select}\left(\_, \_, \_, m\right)=\left[t^{\prime}, \ldots, t^{\prime \prime}, \operatorname{InType}\left(m\right)\right] \\
 \text{where }c^{\prime}=\left[t^{\prime}, \ldots, t^{\prime \prime}\right]</script><p>注意这里笔记改了一下老师的公式，这里 $Select()$ 的参数 $m$ 指caller，$InType()$ 为获取caller类名的函数。</p>
-<p>举例来说：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903204348536.png" alt="image-20200903204348536"></p>
+<p>举例来说：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903204348536.png" alt="image-20200903204348536"></p>
 <p>对于第3、5、7行的调用，1-Type的结果为$[X]$——因为<code>main()</code>方法属于 <code>X</code> 类。不难看出，Type-sensitivity是 Object-sensistivity的再一次抽象，提高速度而降低了精度（效果&lt;=Object-sensitivity）。</p>
-<h2 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h2><p>在李樾、谭添老师的论文[4]中，对比了三者的效率和精度，may-fail-cast 指强制转换出错的次数，精度越高出错次数会越少，call-graph-edge 指产生的调用图边数，精度越高边越少。</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903205546848.png" alt="image-20200903205546848"></p>
+<h2 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h2><p>在李樾、谭添老师的论文[4]中，对比了三者的效率和精度，may-fail-cast 指强制转换出错的次数，精度越高出错次数会越少，call-graph-edge 指产生的调用图边数，精度越高边越少。<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903205546848.png" alt="image-20200903205546848"></p>
 <p>可以看出，从准确率角度，对象敏感最准确；从效率角度，类型敏感效率最高，而对于面向对象的 Java 语言，call-site效果最差。</p>
 <p>顺带一提的是，论文[4]中介绍了一种新算法，因为程序分析在大多时候不需要上下文敏感，因此只在需要上下文敏感处使用准确的Object分析，就可以既保证精度又有足够的速度。</p>
 <h1 id="Propagate-AddEdge-and-Dispatch"><a href="#Propagate-AddEdge-and-Dispatch" class="headerlink" title="Propagate(), AddEdge() and Dispatch()"></a>Propagate(), AddEdge() and Dispatch()</h1><p>Propagate():</p>
