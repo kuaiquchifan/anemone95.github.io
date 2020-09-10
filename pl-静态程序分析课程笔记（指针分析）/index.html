@@ -76,7 +76,7 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析）/image-20200823104858792.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析）/image-20200823202143283.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析）/image-20200823204227690.png">
-<meta property="og:updated_time" content="2020-08-30T12:48:13.085Z">
+<meta property="og:updated_time" content="2020-09-10T13:16:08.058Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（指针分析）">
 <meta name="twitter:description" content="MotivationCHA 只看定义类型，会得到很多实际不被调用的子类方法，如下图所示，CHA的常量分析时只能得到NAC而指针分析会得到更精确的对象类型：Introduction to Pointer Analysis A fundamental static analysis, computes which memory locations a pointer can point to. For">
@@ -310,7 +310,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-30 20:48:13" itemprop="dateModified" datetime="2020-08-30T20:48:13+08:00">2020-08-30</time>
+                <time title="修改时间：2020-09-10 21:16:08" itemprop="dateModified" datetime="2020-09-10T21:16:08+08:00">2020-09-10</time>
               </span>
             
           
@@ -466,12 +466,9 @@
 </li>
 </ul>
 <h1 id="Concerned-Statements"><a href="#Concerned-Statements" class="headerlink" title="Concerned Statements"></a>Concerned Statements</h1><h2 id="Java中的指针"><a href="#Java中的指针" class="headerlink" title="Java中的指针"></a>Java中的指针</h2><ul>
-<li><p>本地变量（local variable），e.g., <code>x</code></p>
-</li>
-<li><p>静态域（static field）, e.g., <code>C.f</code>，作为全局变量分析，与本地变量分析方法类似（本课不做讨论）</p>
-</li>
-<li><p>对象域（instance field），e.g., <code>x.f</code>，实例对象的属性</p>
-</li>
+<li>本地变量（local variable），e.g., <code>x</code></li>
+<li>静态域（static field）, e.g., <code>C.f</code>，作为全局变量分析，与本地变量分析方法类似（本课不做讨论）</li>
+<li>对象域（instance field），e.g., <code>x.f</code>，实例对象的属性</li>
 <li><p>数组元素（array element），e.g., array[i]，由于静态分析没法计算数组下标，通用做法将其作为single field，与处理instance field类似（本课不做讨论）<br><img src="/pl-静态程序分析课程笔记（指针分析）/image-20200820212836084.png" alt="image-20200820212836084"></p>
 <p>如上图所示，原先数组下表的访问<code>array[0]</code> 变为<code>array.arr</code>。</p>
 </li>
@@ -486,52 +483,41 @@
 <p>注意对于真实场景下 <code>x.f.g.h=y</code> 的情况，在三地址码表示时可以用临时变量做简化，变为<code>t1=x.f; t2=t1.g; t2.h=y</code></p>
 <p>对于对象调用(Call)语句，存在三种调用类型：</p>
 <ul>
-<li><p>Static call：<code>C.foo()</code></p>
-</li>
-<li><p>Special call: <code>super.foo()/x.&lt;init&gt;()/this.privateFoo()</code></p>
-</li>
-<li><p>Virtual call: <code>x.foo()</code></p>
-</li>
+<li>Static call：<code>C.foo()</code></li>
+<li>Special call: <code>super.foo()/x.&lt;init&gt;()/this.privateFoo()</code></li>
+<li>Virtual call: <code>x.foo()</code></li>
 </ul>
 <p>由于 static call和special all 都只有一种函数原型，因此只需分析virtual call的情况。</p>
 <h1 id="Pointer-Analysis-Rules"><a href="#Pointer-Analysis-Rules" class="headerlink" title="Pointer Analysis: Rules"></a>Pointer Analysis: Rules</h1><h2 id="Domains-and-Notations"><a href="#Domains-and-Notations" class="headerlink" title="Domains and Notations"></a>Domains and Notations</h2><p>以下为需要用到的定义：</p>
 <ul>
-<li><p>变量：$x,y \in V$</p>
-</li>
-<li><p>域（Fields）：$f,g\in F$</p>
-</li>
-<li><p>对象（Objects）：$o_i, o_j \in O$</p>
-</li>
+<li>变量：$x,y \in V$</li>
+<li>域（Fields）：$f,g\in F$</li>
+<li>对象（Objects）：$o_i, o_j \in O$</li>
 <li>实例属性（Instance fields）：$o_i.f, o_j.g \in O \times F$</li>
 <li>指针：$Pointer = V \cup (O \times F)$</li>
 </ul>
 <p>注：</p>
 <ul>
 <li>$P(O)$ 指$O$的幂集</li>
-<li><p>$pt(p)$ 表示指向 $p$ 的指针集合</p>
-<h2 id="Rules"><a href="#Rules" class="headerlink" title="Rules"></a>Rules</h2></li>
+<li>$pt(p)$ 表示指向 $p$ 的指针集合</li>
 </ul>
-<p>$\frac{a}{b}$为推导符号，即如果条件 $a$ 满足，那么 $b$ 也满足（在infer那也介绍过此符号），个人感觉可以理解为$\{a\}stmt\{b\}$，也可以理解为满足$a$ 后，进行$b$操作。</p>
+<h2 id="Rules"><a href="#Rules" class="headerlink" title="Rules"></a>Rules</h2><p>$\frac{a}{b}$为推导符号，即如果条件 $a$ 满足，那么 $b$ 也满足（在infer那也介绍过此符号），个人感觉可以理解为$\{a\}stmt\{b\}$，也可以理解为满足$a$ 后，进行$b$操作。</p>
 <ul>
-<li><p>New，<code>i: x = new T()</code>，</p>
-<p>新建对象时， $o_i$ 加入指针集中 (写法不同）</p>
+<li><p>New，<code>i: x = new T()</code>，新建对象时， $o_i$ 加入指针集中 (写法不同）：</p>
 <script type="math/tex; mode=display">
 \frac{}{o_i \in pt(x)}</script></li>
-<li><p>Assign, <code>x = y</code></p>
+<li><p>Assign, <code>x = y</code>，出现赋值后，让y指向的内容指向x：</p>
 <script type="math/tex; mode=display">
-\frac{o_{i} \in p t(y)}{o_{i} \in p t(x)}</script><p>出现赋值后，让y指向的内容指向x；</p>
-</li>
-<li><p>Store, <code>x.f = y</code></p>
+\frac{o_{i} \in p t(y)}{o_{i} \in p t(x)}</script></li>
+<li><p>Store, <code>x.f = y</code>，赋值给属性时，将指向 $y$ 的指针也放入 $o_{i}.f$ 的集合中：</p>
 <script type="math/tex; mode=display">
-\frac{o_i \in pt(x), o_j \in pt(y)}{o_j \in pt(o_i.f)}</script><p>赋值给属性时，将指向 $y$ 的指针也放入 $o_{i}.f$ 的集合中</p>
-</li>
-<li><p>Load, <code>y = x.f</code></p>
-<script type="math/tex; mode=display">
-\frac{o_{i} \in p t(x), o_{j} \in p t\left(o_{i} . f\right)}{o_{j} \in p t(y)}</script><p>属性赋值给变量时，指向 $o_i.f$ 的指针指向 $y$</p>
-</li>
+\frac{o_i \in pt(x), o_j \in pt(y)}{o_j \in pt(o_i.f)}</script></li>
 </ul>
-<p>下图给出四种情况的形象表示：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析）/image-20200821212128271.png" alt="image-20200821212128271"></p>
+<ul>
+<li>Load, <code>y = x.f</code>，属性赋值给变量时，指向 $o_i.f$ 的指针指向 $y$：<script type="math/tex; mode=display">
+\frac{o_{i} \in p t(x), o_{j} \in p t\left(o_{i} . f\right)}{o_{j} \in p t(y)}</script></li>
+</ul>
+<p>下图给出四种情况的形象表示：<br><img src="/pl-静态程序分析课程笔记（指针分析）/image-20200821212128271.png" alt="image-20200821212128271"></p>
 <h1 id="How-to-Implement-Pointer-Analysis"><a href="#How-to-Implement-Pointer-Analysis" class="headerlink" title="How to Implement Pointer Analysis"></a>How to Implement Pointer Analysis</h1><blockquote>
 <p>Pointer analysis is to propagate points-to information among pointers (variables &amp; fields).</p>
 </blockquote>
@@ -545,8 +531,7 @@
 <p>Nodes：$Pointer = V \cup (O \times F)$</p>
 <p>图中的边 $x \rightarrow y $ 表示指针 $x$ 指向的对象也被 $y$ 指向（$x$ 的指针信息流向 $y$ ）</p>
 <p>Edges：$Pointer \times Pointer$</p>
-<p>因此，先前的四条语句产生的边可以用下图表示：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析）/image-20200823104858792.png" alt="image-20200823104858792"></p>
+<p>因此，先前的四条语句产生的边可以用下图表示：<br><img src="/pl-静态程序分析课程笔记（指针分析）/image-20200823104858792.png" alt="image-20200823104858792"></p>
 <h1 id="Pointer-Analysis-Algorithms"><a href="#Pointer-Analysis-Algorithms" class="headerlink" title="Pointer Analysis: Algorithms"></a>Pointer Analysis: Algorithms</h1><h2 id="Worklist"><a href="#Worklist" class="headerlink" title="Worklist"></a>Worklist</h2><p>$WL \subseteq      \left \langle Pointer, \mathcal{P}(O)\right \rangle^*$， 即WL中的元素为$n, pts$，表示指针$n$可能指向的内存/对象集合为 $pts$</p>
 <h2 id="加边函数-AddEdge-："><a href="#加边函数-AddEdge-：" class="headerlink" title="加边函数 AddEdge()："></a>加边函数 AddEdge()：</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">AddEdge</span><span class="params">(s, t)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> s → t ∉ PFG:</span><br><span class="line">        add s → t to PFG  <span class="comment"># 将s → t加入PFG</span></span><br><span class="line">        <span class="keyword">if</span> pt(s) <span class="keyword">is</span> <span class="keyword">not</span> empty:</span><br><span class="line">            add &lt;t, pt(s)&gt; to WL <span class="comment"># 将&lt;t,s指向内容&gt;加入工作队列</span></span><br></pre></td></tr></table></figure>
 <p>即若添加 $s \rightarrow t$ ，首先检查该边是否在PFG中，若不存在，则将该边加入PFG；并且检查 s 指向的内存集合，如果集合不空，则需保证 $s$ 指向的内容被 $t$ 指向，即加入工作队列中。</p>
@@ -555,27 +540,21 @@
 <h2 id="主函数-Solve-："><a href="#主函数-Solve-：" class="headerlink" title="主函数 Solve()："></a>主函数 <code>Solve()</code>：</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Solve</span><span class="params">(s)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    S: 程序所有语句</span></span><br><span class="line"><span class="string">    WL：工作队列</span></span><br><span class="line"><span class="string">    PFG： Pointer flow graph</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">	WL = [] <span class="comment"># e.g., [&lt;n, pts&gt;] 表示指针n可能会指向pts集合（每次迭代就会有新的可能）</span></span><br><span class="line">	PFG = &#123;&#125; <span class="comment"># e.g., &#123;&lt;x, &#123;𝑜𝑖&#125;&gt;&#125; 表示指针x指向对象𝑜𝑖</span></span><br><span class="line">	<span class="keyword">for</span> each i: x = new T() ∈ 𝑆: <span class="comment"># 处理 new stmt</span></span><br><span class="line">		add &lt;x, &#123;𝑜𝑖&#125;&gt; to WL </span><br><span class="line">	<span class="keyword">for</span> each x = y ∈ S: <span class="comment"># 处理 assign stmt</span></span><br><span class="line">		AddEdge(y, x)</span><br><span class="line">	<span class="keyword">while</span> WL <span class="keyword">is</span> <span class="keyword">not</span> empty:</span><br><span class="line">        remove n, pts <span class="keyword">from</span> WL</span><br><span class="line">        Δ = pts - pt(n)</span><br><span class="line">        Propagate(n, Δ)</span><br><span class="line">        <span class="keyword">if</span> n represents a variable x:</span><br><span class="line">            <span class="keyword">for</span> each 𝑜𝑖 ∈ Δ:</span><br><span class="line">                <span class="keyword">for</span> each x.f = y ∈ S: <span class="comment"># 处理 store stmt</span></span><br><span class="line">                    AddEdge(y, 𝑜𝑖.𝑓)</span><br><span class="line">                <span class="keyword">for</span> each y = x.f ∈ S: <span class="comment"># 处理 load stmt</span></span><br><span class="line">                    AddEdge(𝑜𝑖.𝑓, y)</span><br></pre></td></tr></table></figure>
 <p>首先可以看到，在9、11、19和21行分别处理了new、assign、store和load操作：</p>
 <ul>
-<li><p>对于new操作，直接将 $\left \langle x, o_i \right\rangle$ 加入worklist</p>
-</li>
-<li><p>对于assign操作，将x指向的内容也被y指向，即调用<code>AddEdge()</code></p>
-</li>
+<li>对于new操作，直接将 $\left \langle x, o_i \right\rangle$ 加入worklist</li>
+<li>对于assign操作，将x指向的内容也被y指向，即调用<code>AddEdge()</code></li>
 </ul>
 <p>接下来进入循环，直到工作队列为空：</p>
 <ol>
-<li><p>取出队头要处理的指针n和其对应的pts</p>
-</li>
-<li><p>求差异 Δ，pts中的有一些地址先前已经传播过，只需处理剩余部分</p>
-</li>
-<li><p>调用<code>Propogate()</code>，将 Δ 内容放入 $pt(n)$ 并且添加新的work</p>
-</li>
+<li>取出队头要处理的指针n和其对应的pts</li>
+<li>求差异 Δ，pts中的有一些地址先前已经传播过，只需处理剩余部分</li>
+<li>调用<code>Propogate()</code>，将 Δ 内容放入 $pt(n)$ 并且添加新的work</li>
 </ol>
 <p>接着需要处理对象操作，17-18的行意指若指针n表示的是一个变量（而不是field)，那么对于每一个 Δ 中的对象实例，处理所有与 $x.f$ 相关的 store 和 load 操作，对 store 和 load 操作都是使用<code>AddEdge()</code>处理（19-22行）。</p>
 <h2 id="具体示例"><a href="#具体示例" class="headerlink" title="具体示例"></a>具体示例</h2><p>考虑如下代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">b = <span class="keyword">new</span> C();</span><br><span class="line">a = b;</span><br><span class="line">c = <span class="keyword">new</span> C();</span><br><span class="line">c.f = a;</span><br><span class="line">d = c;</span><br><span class="line">c.f = d;</span><br><span class="line">e = d.f;</span><br></pre></td></tr></table></figure>
-<p>首先经过<code>solve():L9-12</code>的初始化：</p>
+<p><strong>首先经过<code>solve():L9-12</code>的初始化：</strong></p>
 <ul>
-<li><p>WL=[&lt;b,{o1}&gt;, &lt;c,{o3}&gt;]</p>
-</li>
+<li>WL=[&lt;b,{o1}&gt;, &lt;c,{o3}&gt;]</li>
 <li><p>PFG:</p>
 <pre class="mermaid">  graph RL
     b("b{}") --> a("a{}")
@@ -583,23 +562,19 @@
 
 </li>
 </ul>
-<p>处理&lt;b,{o1}&gt;: 主要执行第16行<code>Propagate()</code></p>
+<p><strong>处理&lt;b,{o1}&gt;</strong>: 主要执行第16行<code>Propagate()</code></p>
 <ul>
-<li><p>WL=[&lt;c,{o3}&gt;, &lt;a,{o1}&gt;]，因为b→a，所以增加了一个新work</p>
-</li>
-<li><p>PFG:</p>
-<pre class="mermaid">  graph RL
+<li>WL=[&lt;c,{o3}&gt;, &lt;a,{o1}&gt;]，因为b→a，所以增加了一个新work</li>
+<li>PFG:<pre class="mermaid">  graph RL
     b("b{o1}") --> a("a{}")
     c("c{}") --> d("d{}")</pre>
 
 </li>
 </ul>
-<p>处理&lt;c, {o3}&gt;：除了<code>propagate(c, {o3})</code>，注意到第 4 行和第 6 行，所以还需处理store，即<code>AddEdge(a,o3.f)</code>,<code>AddEdge(d,o3.f)</code>，因为目前 a 和 d 指向内容都是空集，所以 WL 不增加</p>
+<p><strong>处理&lt;c, {o3}&gt;</strong>，除了<code>propagate(c, {o3})</code>，注意到第 4 行和第 6 行，所以还需处理store，即<code>AddEdge(a,o3.f)</code>,<code>AddEdge(d,o3.f)</code>，因为目前 a 和 d 指向内容都是空集，所以 WL 不增加：</p>
 <ul>
-<li><p>WL=[&lt;a,{o1}&gt;, &lt;d,{o3}&gt;]</p>
-</li>
-<li><p>PFG:    </p>
-<pre class="mermaid">  graph RL
+<li>WL=[&lt;a,{o1}&gt;, &lt;d,{o3}&gt;]</li>
+<li>PFG:    <pre class="mermaid">  graph RL
     b("b{o1}") --> a("a{}")
     c("c{o3}") --> d("d{}")
     a-->o3.f["o3.f{}"] 
@@ -607,12 +582,10 @@
 
 </li>
 </ul>
-<p>处理&lt;a,{o1}&gt;：<code>propagate(a, {o1})</code></p>
+<p><strong>处理&lt;a,{o1}&gt;</strong>，<code>propagate(a, {o1})</code>：</p>
 <ul>
-<li><p>WL=[&lt;d,{o3}&gt;, &lt;o3.f, {o1}&gt;]</p>
-</li>
-<li><p>PFG:    </p>
-<pre class="mermaid">  graph RL
+<li>WL=[&lt;d,{o3}&gt;, &lt;o3.f, {o1}&gt;]</li>
+<li>PFG:    <pre class="mermaid">  graph RL
     b("b{o1}") --> a("a{o1}")
     c("c{o3}") --> d("d{}")
     a-->o3.f["o3.f{}"] 
@@ -620,10 +593,9 @@
 
 </li>
 </ul>
-<p>处理&lt;d,{o3}&gt;：<code>propagate(d, {o3})</code>, 以及注意到第 7 行的 load 语句，调用<code>AddEdge(o3.f,e)</code></p>
+<p><strong>处理&lt;d,{o3}&gt;</strong>，<code>propagate(d, {o3})</code>, 以及注意到第 7 行的 load 语句，调用<code>AddEdge(o3.f,e)</code>：</p>
 <ul>
-<li><p>WL=[&lt;o3.f, {o1}&gt;, &lt;o3.f, {o3}&gt;]</p>
-</li>
+<li>WL=[&lt;o3.f, {o1}&gt;, &lt;o3.f, {o3}&gt;]</li>
 <li><p>PFG:    </p>
 <pre class="mermaid">  graph RL
     b("b{o1}") --> a("a{o1}")
@@ -634,7 +606,7 @@
 
 </li>
 </ul>
-<p>后面步骤省略，最后 PFG 结果为：</p>
+<p><strong>后面步骤省略，最后 PFG 结果为：</strong></p>
 <pre class="mermaid">graph RL
       b("b{o1}") --> a("a{o1}")
       c("c{o3}") --> d("d{o3}")
@@ -656,18 +628,14 @@ m' ,& \text{if } c \text{ contains non-abstract method }m' \\
 Dispatch(c', m), & \text{otherwise}
 \end{array}\right.\\
 \text{where }c'\text{ is superclass of }c</script></li>
-<li><p>被$x$ 指向的对象$o_i$ ，也被 $m_{this}$ 指向；</p>
-</li>
-<li><p>对于每一个实参$a_j$所指向的信息，也被形参 $m_{pj}$ 所指向——在PFG上增加 “实参→形参”边；</p>
-</li>
-<li><p>对于被返回值 $m_{ret}$ 指向的对象$o_v$，也被等号左边变量 $r$ 指向——在PFG上增加“ret→r”的边。</p>
-</li>
+<li>被$x$ 指向的对象$o_i$ ，也被 $m_{this}$ 指向；</li>
+<li>对于每一个实参$a_j$所指向的信息，也被形参 $m_{pj}$ 所指向——在PFG上增加 “实参→形参”边；</li>
+<li>对于被返回值 $m_{ret}$ 指向的对象$o_v$，也被等号左边变量 $r$ 指向——在PFG上增加“ret→r”的边。</li>
 </ol>
 <p><strong>讨论为什么对于 $m_{this}$ 不增加边，而对其他参数就增加边：</strong></p>
 <p>注意到 $x$ 指向的信息是一个集合，而 $m_{this}$ 由$Dispatch()$ 解析后可以唯一确定一个对象，换句话说：</p>
 <ol>
-<li><p>对于this来说，指针分析已经可以唯一确定该对象实例，若传递 $x$ 的指向对象集合反而造成分析不准确，如下图所示：</p>
-<p><img src="/pl-静态程序分析课程笔记（指针分析）/image-20200823204227690.png" alt="image-20200823204227690"></p>
+<li><p>对于this来说，指针分析已经可以唯一确定该对象实例，若传递 $x$ 的指向对象集合反而造成分析不准确，如下图所示：<br><img src="/pl-静态程序分析课程笔记（指针分析）/image-20200823204227690.png" alt="image-20200823204227690"></p>
 </li>
 <li><p>对于其他参数，指针分析无法确定它们的唯一对象实例，为保证may分析，需要传递先前所有可能性，即可能指向的集合。</p>
 </li>
@@ -686,51 +654,35 @@ Dispatch(c', m), & \text{otherwise}
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ProcessCall</span><span class="params">(x, 𝑜𝑖)</span>:</span> </span><br><span class="line">    <span class="keyword">for</span> l: r = x.k(a1,…,an) ∈ S:</span><br><span class="line">        <span class="comment"># 获取方法m</span></span><br><span class="line">        𝑚 = Dispatch(𝑜𝑖, k)</span><br><span class="line">        <span class="comment"># pass receiver object to "this"</span></span><br><span class="line">        add &lt;m_this,&#123;𝑜𝑖&#125;&gt; to WL</span><br><span class="line">        <span class="keyword">if</span> l → m ∉ CG:</span><br><span class="line">            <span class="comment"># 构建call graph</span></span><br><span class="line">            add l → m to CG</span><br><span class="line">            <span class="comment"># 标记新方法为已知方法</span></span><br><span class="line">            AddReachable(m)</span><br><span class="line">            <span class="comment"># 传递每个参数，建边</span></span><br><span class="line">            <span class="keyword">for</span> parameter 𝑝𝑖 of m:</span><br><span class="line">                AddEdge(𝑎𝑖, 𝑝𝑖)</span><br><span class="line">            <span class="comment"># 传递返回值</span></span><br><span class="line">            AddEdge(𝑚_𝑟𝑒𝑡, r)</span><br></pre></td></tr></table></figure>
 <h2 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h2><p>设有如下待分析代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        A a = <span class="keyword">new</span> A();</span><br><span class="line">        A b = <span class="keyword">new</span> B();</span><br><span class="line">        A c = b.foo(a);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">A <span class="title">foo</span><span class="params">(A x)</span> </span>&#123; … &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> <span class="keyword">extends</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="function">A <span class="title">foo</span><span class="params">(A y)</span> </span>&#123;</span><br><span class="line">        A r = <span class="keyword">new</span> A();</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>首先程序初始化，有如下结果：</p>
+<p><strong>首先程序初始化，有如下结果：</strong></p>
 <ul>
-<li><p>worklist，由3、4行的new stmt：</p>
-<p>WL=[&lt;a,{o3}&gt;,&lt;b,{o4}&gt;]</p>
-</li>
-<li><p>RM，<code>A.main()</code>成为已知函数：</p>
-<p>RM={A.main()}</p>
-</li>
-<li><p>CG={}</p>
-</li>
-<li><p>PFG为空，因为没有assign</p>
-</li>
+<li>worklist，由3、4行的new stmt：<br>WL=[&lt;a,{o3}&gt;,&lt;b,{o4}&gt;]</li>
+<li>RM，<code>A.main()</code>成为已知函数：<br>RM={A.main()}</li>
+<li>CG={}</li>
+<li>PFG为空，因为没有assign</li>
 </ul>
 <p><strong>进入循环，处理 &lt;a,{o3}&gt;：</strong></p>
 <p><code>a</code>没有store、load和call，因此只做<code>propagate(a,{o3})</code></p>
 <ul>
-<li><p>WL=[&lt;b,{o4}&gt;]</p>
-</li>
-<li><p>RM={A.main()}</p>
-</li>
-<li><p>CG={}</p>
-</li>
-<li><p>PFG:</p>
-  <pre class="mermaid">    graph RL
+<li>WL=[&lt;b,{o4}&gt;]</li>
+<li>RM={A.main()}</li>
+<li>CG={}</li>
+<li>PFG:  <pre class="mermaid">    graph RL
       a("a{o3}")</pre>
 
 </li>
 </ul>
 <p><strong>处理 &lt;b,{o4}&gt;：</strong></p>
 <ol>
-<li><p>先做<code>propagate(b,{o4})</code>;</p>
-</li>
-<li><p>由于第5行存在调用，执行<code>ProcessCall(b, o4)</code>，在函数中，首先解析到调用函数为<code>m=B.foo(A)</code>，将 &lt;B.foo/this. {o4}&gt; 加入 worklist;</p>
-</li>
-<li><p>接着由于之前没有分析过该函数调用:</p>
-<ol>
+<li>先做<code>propagate(b,{o4})</code>;</li>
+<li>由于第5行存在调用，执行<code>ProcessCall(b, o4)</code>，在函数中，首先解析到调用函数为<code>m=B.foo(A)</code>，将 &lt;B.foo/this. {o4}&gt; 加入 worklist;</li>
+<li>接着由于之前没有分析过该函数调用:<ol>
 <li>将 <code>5→B.foo(A)</code> 加入CG</li>
 </ol>
 </li>
-<li><p>调用 <code>AddReachable()</code></p>
-<ol>
-<li><p>将<code>B.foo(A)</code>加入到已知函数</p>
-</li>
-<li><p>注意到11行存在new操作，将{&lt;r, o11&gt;}加入worklist</p>
-</li>
+<li>调用 <code>AddReachable()</code>   <ol>
+<li>将<code>B.foo(A)</code>加入到已知函数   </li>
+<li>注意到11行存在new操作，将{&lt;r, o11&gt;}加入worklist</li>
 <li>调用 <code>AddEdge(ai, pi)</code>，更新PFG</li>
 <li>调用<code>AddEdge(r, c)</code>，更新PFG</li>
 </ol>
@@ -738,14 +690,10 @@ Dispatch(c', m), & \text{otherwise}
 </ol>
 <p>处理结果为：</p>
 <ul>
-<li><p>WL=[&lt;B.foo/this, {o4}&gt;, &lt;r, {o11}&gt;, &lt;y, {o3}&gt;]</p>
-</li>
-<li><p>RM={A.main(), B.foo(A)}</p>
-</li>
-<li><p>CG={5→B.foo(A)}</p>
-</li>
-<li><p>PFG:</p>
-  <pre class="mermaid">    graph RL
+<li>WL=[&lt;B.foo/this, {o4}&gt;, &lt;r, {o11}&gt;, &lt;y, {o3}&gt;]</li>
+<li>RM={A.main(), B.foo(A)}</li>
+<li>CG={5→B.foo(A)}</li>
+<li>PFG:  <pre class="mermaid">    graph RL
       a("a{o3}")-->y("y{}")
       b("b{}")
       r("r{}")-->c("c{}")</pre>
@@ -755,14 +703,10 @@ Dispatch(c', m), & \text{otherwise}
 <p><strong>处理<code>&lt;B.foo/this, {o4}&gt;</code>：</strong></p>
 <p>只需要做<code>Propagate(B.foo/this, {o4})</code></p>
 <ul>
-<li><p>WL=[&lt;B.foo/this, {o4}&gt;, &lt;r, {o11}&gt;, &lt;y, {o3}&gt;]</p>
-</li>
-<li><p>RM={A.main(), B.foo(A)}</p>
-</li>
-<li><p>CG={5→B.foo(A)}</p>
-</li>
-<li><p>PFG:</p>
-  <pre class="mermaid">    graph RL
+<li>WL=[&lt;B.foo/this, {o4}&gt;, &lt;r, {o11}&gt;, &lt;y, {o3}&gt;]</li>
+<li>RM={A.main(), B.foo(A)}</li>
+<li>CG={5→B.foo(A)}</li>
+<li>PFG:  <pre class="mermaid">    graph RL
       a("a{o3}")-->y("y{}")
       b("b{}")
       r("r{}")-->c("c{}")
@@ -772,14 +716,10 @@ Dispatch(c', m), & \text{otherwise}
 </ul>
 <p>后续步骤类似，最后结果为：</p>
 <ul>
-<li><p>WL=[&lt;B.foo/this, {o4}&gt;, &lt;r, {o11}&gt;, &lt;y, {o3}&gt;]</p>
-</li>
-<li><p>RM={A.main(), B.foo(A)}</p>
-</li>
-<li><p>CG={5→B.foo(A)}</p>
-</li>
-<li><p>PFG:</p>
-  <pre class="mermaid">    graph RL
+<li>WL=[&lt;B.foo/this, {o4}&gt;, &lt;r, {o11}&gt;, &lt;y, {o3}&gt;]</li>
+<li>RM={A.main(), B.foo(A)}</li>
+<li>CG={5→B.foo(A)}</li>
+<li>PFG:  <pre class="mermaid">    graph RL
       a("a{o3}")-->y("y{o3}")
       b("b{o4}")
       r("r{o11}")-->c("c{o11}")
