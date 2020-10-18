@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -82,8 +82,10 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（IFDS）/image-20200913195133207.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（IFDS）/image-20200913180807055.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（IFDS）/image-20200913195831242.png">
+<meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（IFDS）/image-20201003173839070.png">
+<meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（IFDS）/image-20201003204423702.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（IFDS）/image-20200913202232341.png">
-<meta property="og:updated_time" content="2020-09-13T12:29:45.313Z">
+<meta property="og:updated_time" content="2020-10-04T03:27:31.694Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（IFDS）">
 <meta name="twitter:description" content="Feasible and Realizable Paths(In)Feasible Paths Infeasible Paths: Paths in CFG that do not correspond to actual executions. 程序在CFG中会存在不被执行到路径，这些路径会污染分析结果，给静态分析带来不利影响。">
@@ -238,17 +240,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -317,7 +320,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-13 20:29:45" itemprop="dateModified" datetime="2020-09-13T20:29:45+08:00">2020-09-13</time>
+                <time title="修改时间：2020-10-04 11:27:31" itemprop="dateModified" datetime="2020-10-04T11:27:31+08:00">2020-10-04</time>
               </span>
             
           
@@ -473,8 +476,30 @@ MRP_n \sqsubseteq MOP_n</script><h1 id="Supergraph-and-Flow-Functions"><a href="
 <p>算法内容如下，其复杂度为$O(ED^3)$，课程中并没有时间说明时间细节：</p>
 <p><img src="/pl-静态程序分析课程笔记（IFDS）/image-20200913180807055.png" alt="image-20200913180807055"></p>
 <p>算法中主要思想是在每个exit node处进行CFL-Reachability 检查，而其他node之间自然可达（绿色）；</p>
-<p>此外，增加summary edge，连接$\langle Call, d_m\rangle \rightarrow \langle Ret, d_n \rangle$，作为记忆，下次做该函数调用时不需要重复计算被调函数内部的path：</p>
+<p>此外，增加summary edge，连接$\langle Call, d_m\rangle \rightarrow \langle Ret, d_n \rangle$，作为记忆（e.g., $a\rightarrow \{b\}$, $b\rightarrow\{b, c\}$），下次做该函数调用时不需要重复计算被调函数内部的path：</p>
 <p><img src="/pl-静态程序分析课程笔记（IFDS）/image-20200913195831242.png" alt="image-20200913195831242"></p>
+<h1 id="Function-summary"><a href="#Function-summary" class="headerlink" title="Function summary"></a>Function summary</h1><p>对于程序中的库调用函数，可以体现做函数摘要，如下图所示：</p>
+<p><img src="/pl-静态程序分析课程笔记（IFDS）/image-20201003173839070.png" alt="image-20201003173839070"></p>
+<p>只要在库上跑一遍 IDFS 就可以得到函数摘要：</p>
+<p><img src="/pl-静态程序分析课程笔记（IFDS）/image-20201003204423702.png" alt="image-20201003204423702"></p>
+<p>函数摘要不需要保存函数内部转换过程（蓝色线），只需要保存转换结果（红色线），但是这样的话做摘要就得计算每个变量的可达性，即复杂度是$O(n^2)$，n为变量个数（还包括全局变量）。</p>
+<p><strong>函数摘要实际上形式</strong>是$f: \langle gen, kill\rangle$，换句话说$f(x)=gen\cup(x-kill)$，函数执行初始值为$\langle\{\},\{\}\rangle$）</p>
+<p>在函数内做数据流分析，transfer为$\left(g_{1}, k_{1}\right) \circ\left(g_{2}, k_{2}\right)=\left(g_{2} \cup\left(g_{1}-k_{2}\right), k_{1} \cup k_{2}\right)$：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+f_{2} \circ f_{1}(x) &=gen_{2} \cup\left(\left(gen_{1} \cup\left(x-kill_{1}\right)\right)-kill_{2}\right) \\
+&=\left(gen_{2} \cup\left(gen_{1}-kill_{2}\right)\right) \cup\left(x-\left(kill_{1} \cup kill_{2}\right)\right)\\
+\end{aligned}</script><p>汇聚点操作为$\left(g_{1}, k_{1}\right) \sqcap\left(g_{2}, k_{2}\right)=\left(g_{1} \cup g_{2}, k_{1} \cap k_{2}\right)$：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\left(f_{1} \sqcap f_{2}\right)(x) &=f_{1}(x) \sqcap f_{2}(x) \\
+&=\left(g e n_{1} \cup\left(x-k i l l_{1}\right)\right) \cup\left(g e n_{2} \cup\left(x-k i l l_{2}\right)\right) \\
+&=\left(g e n_{1} \cup g e n_{2}\right) \cup\left(x-\left(k i l l_{1} \cap k i l l_{2}\right)\right)
+\end{aligned}</script><p>通过证明，可见用以上方法做出来的函数摘要进行数据流分析，分析结果和原数据流分析完全相同(具有单调性、分配性和正确性)。</p>
+<p>这里个人有个疑惑，考虑如下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Adder</span> </span>&#123; <span class="function">String <span class="title">add</span><span class="params">(String a,String b)</span></span>;&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adder1</span> <span class="keyword">implements</span> <span class="title">Adder</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">add</span><span class="params">(String a, String b)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a+b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adder2</span> <span class="keyword">implements</span> <span class="title">Adder</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">add</span><span class="params">(String a, String b)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a+<span class="string">"b"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AdderAgent</span> <span class="keyword">implements</span> <span class="title">Adder</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Adder adder;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AdderAgent</span><span class="params">(Adder a)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.adder = a;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">add</span><span class="params">(String a, String b)</span></span>&#123; <span class="comment">// summary this</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.adder.add(a,b);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">add</span><span class="params">(Adder adder, String a, String b)</span></span>&#123; <span class="comment">// summary this</span></span><br><span class="line">        <span class="keyword">return</span> adder.add(a,b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果需要对<code>AdderAgent.add(Adder adder, String a, String b)</code>做函数摘要，那么其因为依赖于adder的实现，就可能需要做两份摘要，即若adder=Adder1时，其摘要是$\langle(ret\rightarrow a+b),(ret\rightarrow any)\rangle$，若adder=Adder2时，其摘要是$\langle(ret\rightarrow a),(ret\rightarrow any)\rangle$，也就是说，要做两份函数摘要，这里份数取决于Adder子类的个数。</p>
+<p>此外，对<code>AdderAgent.add(String a, String b)</code>还要保存其成员变量（self.adder）的类型。</p>
 <h1 id="Understanding-the-Distributivity-of-IFDS"><a href="#Understanding-the-Distributivity-of-IFDS" class="headerlink" title="Understanding the Distributivity of IFDS"></a>Understanding the Distributivity of IFDS</h1><p>IFDS不能做Flow function不满足分配性（$F(x \wedge y) \neq F(x) \wedge F(y)$）的数据流分析。</p>
 <p>以<strong>常量传播</strong>为例，考虑<code>z=x+y</code>，设计的Flow function为$(x,y,_)\rightarrow(x+y,_)$，可以看到一个输出是两个输入<strong>“同时”</strong>决定的，在representation relation中是无法表示的，换句话说，<strong>IFDS只能描述data fact（点）和propagation（边）能被独立处理的分析问题</strong>（按个人理解，IFDS能处理的一个原子操作就是$a \rightarrow b$，可以独立表示$a\rightarrow b,c\rightarrow b,b\rightarrow b$，而不能表示$a\wedge c \rightarrow b$）。</p>
 <p>同样，IFDS不能用于<strong>指针分析</strong>，如下图所示，当处理<code>z=y.f</code>语句时，由于没有别名信息，无法连接$x\rightarrow y.f$边，因此分析结果是错误的，而若加上别名分析，因为又是多输入，因此指针分析也不满足分配性。</p>
@@ -610,7 +635,7 @@ S \rightarrow \alpha</script><p>where $S$ is  a single nonterminal and $\alpha$ 
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Feasible-and-Realizable-Paths"><span class="nav-number">1.</span> <span class="nav-text">Feasible and Realizable Paths</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#In-Feasible-Paths"><span class="nav-number">1.1.</span> <span class="nav-text">(In)Feasible Paths</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Realizable-Paths"><span class="nav-number">1.2.</span> <span class="nav-text">Realizable Paths</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CFL-Reachability"><span class="nav-number">2.</span> <span class="nav-text">CFL-Reachability</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview-of-IFDS"><span class="nav-number">3.</span> <span class="nav-text">Overview of IFDS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview"><span class="nav-number">3.1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MRP"><span class="nav-number">3.2.</span> <span class="nav-text">MRP</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Supergraph-and-Flow-Functions"><span class="nav-number">4.</span> <span class="nav-text">Supergraph and Flow Functions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Supergraph"><span class="nav-number">4.1.</span> <span class="nav-text">Supergraph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flow-Function"><span class="nav-number">4.2.</span> <span class="nav-text">Flow Function</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Exploded-Supergraph-and-Tabulation-Algorithm"><span class="nav-number">5.</span> <span class="nav-text">Exploded Supergraph and Tabulation Algorithm</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Build-Exploded-Supergraph"><span class="nav-number">5.1.</span> <span class="nav-text">Build Exploded Supergraph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tabulation-Algorithm"><span class="nav-number">5.2.</span> <span class="nav-text">Tabulation Algorithm</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Understanding-the-Distributivity-of-IFDS"><span class="nav-number">6.</span> <span class="nav-text">Understanding the Distributivity of IFDS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Appendix-Context-free-Grammar"><span class="nav-number">8.</span> <span class="nav-text">Appendix: Context-free Grammar</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">9.</span> <span class="nav-text">References</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Feasible-and-Realizable-Paths"><span class="nav-number">1.</span> <span class="nav-text">Feasible and Realizable Paths</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#In-Feasible-Paths"><span class="nav-number">1.1.</span> <span class="nav-text">(In)Feasible Paths</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Realizable-Paths"><span class="nav-number">1.2.</span> <span class="nav-text">Realizable Paths</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CFL-Reachability"><span class="nav-number">2.</span> <span class="nav-text">CFL-Reachability</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview-of-IFDS"><span class="nav-number">3.</span> <span class="nav-text">Overview of IFDS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview"><span class="nav-number">3.1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MRP"><span class="nav-number">3.2.</span> <span class="nav-text">MRP</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Supergraph-and-Flow-Functions"><span class="nav-number">4.</span> <span class="nav-text">Supergraph and Flow Functions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Supergraph"><span class="nav-number">4.1.</span> <span class="nav-text">Supergraph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flow-Function"><span class="nav-number">4.2.</span> <span class="nav-text">Flow Function</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Exploded-Supergraph-and-Tabulation-Algorithm"><span class="nav-number">5.</span> <span class="nav-text">Exploded Supergraph and Tabulation Algorithm</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Build-Exploded-Supergraph"><span class="nav-number">5.1.</span> <span class="nav-text">Build Exploded Supergraph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tabulation-Algorithm"><span class="nav-number">5.2.</span> <span class="nav-text">Tabulation Algorithm</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Function-summary"><span class="nav-number">6.</span> <span class="nav-text">Function summary</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Understanding-the-Distributivity-of-IFDS"><span class="nav-number">7.</span> <span class="nav-text">Understanding the Distributivity of IFDS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Appendix-Context-free-Grammar"><span class="nav-number">9.</span> <span class="nav-text">Appendix: Context-free Grammar</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">10.</span> <span class="nav-text">References</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -629,7 +654,7 @@ S \rightarrow \alpha</script><p>where $S$ is  a single nonterminal and $\alpha$ 
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -655,7 +680,7 @@ S \rightarrow \alpha</script><p>where $S$ is  a single nonterminal and $\alpha$ 
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -867,7 +892,10 @@ S \rightarrow \alpha</script><p>where $S$ is  a single nonterminal and $\alpha$ 
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

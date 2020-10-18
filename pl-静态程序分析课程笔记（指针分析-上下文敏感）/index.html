@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -82,7 +82,7 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902213557030.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903204348536.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200903205546848.png">
-<meta property="og:updated_time" content="2020-09-09T13:16:42.627Z">
+<meta property="og:updated_time" content="2020-10-04T04:13:35.481Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（指针分析-上下文敏感）">
 <meta name="twitter:description" content="IntroductionProblem of Context-Insensitive (C.I.) 每次函数调用时，调用的上下文不一样； 在不同的调用上下文里，函数内的变量会指向不同； 在上下文不敏感的指针分析中，函数内的对象指向的内容是不同上下文混合起来的（如上例中 $n$ 指向 $o_1$ 和 $o_2$），而这些内容会后向传播，造成更多不准确的结果。">
@@ -237,17 +237,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -316,7 +317,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-09 21:16:42" itemprop="dateModified" datetime="2020-09-09T21:16:42+08:00">2020-09-09</time>
+                <time title="修改时间：2020-10-04 12:13:35" itemprop="dateModified" datetime="2020-10-04T12:13:35+08:00">2020-10-04</time>
               </span>
             
           
@@ -359,7 +360,7 @@
 <li>在上下文不敏感的指针分析中，函数内的对象指向的内容是不同上下文混合起来的（如上例中 $n$ 指向 $o_1$ 和 $o_2$），而这些内容会后向传播，造成更多不准确的结果。</li>
 </ul><a id="more"></a>
 <p>具体如下图所示：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200829210207900.png" alt="image-20200829210207900"></p>
-<p>当分析到<code>int i = x.get()</code> 时，上下文不敏感指针分析会认为 $x$ 指向 $o_1,o_2$，因此做常量分析时，$i$ 的分析结果就是 NAC，这当然是不准确的。</p>
+<p>当分析到<code>int i = x.get()</code> 时，上下文不敏感指针分析会认为 $x$ 指向 $o_1,o_2$，因此做常量分析时，$i$ 的分析结果就是 NAC，这当然是不准确的——其关键点在于n没有上下文，因此不同函数调用时，n会记录下所有调用结果的集合。</p>
 <h2 id="Context-Sensitivity-C-S"><a href="#Context-Sensitivity-C-S" class="headerlink" title="Context Sensitivity(C.S.)"></a>Context Sensitivity(C.S.)</h2><blockquote>
 <p>Context sensitivity models calling contexts by distinguishing different data flows of different contexts to improve precision.</p>
 </blockquote>
@@ -373,6 +374,8 @@
 </blockquote>
 <p>注意，对每个函数的克隆本质是对函数内变量的克隆，如下图所示：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200830103742490.png" alt="image-20200830103742490"></p>
 <p>对于<code>id()</code>函数内变量 <code>n</code> 来说，在第一行和第二行调用时，分别克隆出<code>[1]:n</code>和<code>[2]:n</code>个变量</p>
+<p><strong>补充1：</strong>另一种实现方法是使用内联，即把被调函数的代码嵌入到调用函数中，对参数进行改名替换，实际效果与这里的克隆等效。</p>
+<p><strong>补充2：</strong>克隆思想不只是可以做过程间分析，还可以做过程内分析，比如对于循环，可以展开一定层数k做分析。</p>
 <h2 id="Context-Sensitive-Heap"><a href="#Context-Sensitive-Heap" class="headerlink" title="Context-Sensitive Heap"></a>Context-Sensitive Heap</h2><p>对于OO语言，不仅变量有上下文，对象实例也需要有上下文，即需要做堆抽象（对象存储在堆区）。</p>
 <p>如下图，对<code>n</code>做上下文敏感分析：<br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/Inkedimage-20200830104632305_LI.jpg" alt="image-20200830104632305"><br>在变量上下文敏感，堆不敏感时（左侧），在<code>newX(Number)</code>中x没有上下文，恒指向$o_8$，那么在第三行第四行调用时， $o_8.f$ 存在 $o_1, o_2$两种可能，因此n也有两种可能，分析结果不准确。</p>
 <p>而堆敏感时（右侧），<code>newX(Number)</code>中存在上下文，即对于第三行第四行调用，产生不同上下文的x——$3:o_8$ 和$4:o_8$，它们分别指向$o_1$和$o_2$，因此n的分析时准确的。</p>
@@ -460,15 +463,15 @@ c^{\prime \prime \prime}: o_{v} \in p t(c: r)
 <p>接着处理<code>worklist</code>，在处理store和load语句时，按先前图示添加边即可；</p>
 <p>重点在于<code>ProcessCall()</code>，根据先前分析，首先用<code>Dispatch()</code>解析出调用的方法，接着通过<code>Select()</code>获取调用进callee的上下文 $c^t$，接下来的加入工作列表、加入可达函数集合的操作都在 $c^t$ 上下文中进行，最后按先前图示加入参数和返回值的边。</p>
 <h1 id="Context-Sensitivity-Variants（Implementation-of-Select-）"><a href="#Context-Sensitivity-Variants（Implementation-of-Select-）" class="headerlink" title="Context Sensitivity Variants（Implementation of Select()）"></a>Context Sensitivity Variants（Implementation of <code>Select()</code>）</h1><p>对于上下文有不同的抽象表示，其中主要有 Call-site sensitivity，Object sensitivity 和 Type sensitivity。</p>
-<h2 id="Call-Site-Sensitivity-k-CFA"><a href="#Call-Site-Sensitivity-k-CFA" class="headerlink" title="Call-Site Sensitivity(k-CFA)"></a>Call-Site Sensitivity(k-CFA)</h2><p>调用点敏感 [1]上下文由调用点行号和先前上下文组抽，即上下文本质上是调用栈的抽象：</p>
+<h2 id="Call-Site-Sensitivity-k-CFA"><a href="#Call-Site-Sensitivity-k-CFA" class="headerlink" title="Call-Site Sensitivity(k-CFA)"></a>Call-Site Sensitivity(k-CFA)</h2><p>调用点敏感 [1]上下文由调用点行号和先前上下文组成，即上下文本质上是调用栈的抽象：</p>
 <script type="math/tex; mode=display">
 Select(\boldsymbol{c},\boldsymbol{l},\_)=[l',\dots,l'',l]\\
 \text{where }c=[l',\dots,l'']</script><p>上式表示了调用点敏感的<code>select()</code>函数的实现，即当前上下文 $c$ 的 $l$ 行发生了调用，那么调用进的上下文为$[c,l]$</p>
-<p>但碰到递归调用时，上下文会无限的增加，此时需要视上下文为队列，并限制队列长度$k$（因此此方法也叫 k-CFA），实际应用时，$k \leq 3$，且函数上下文长度和堆上下文长度可以不一致，目前效果最好的是函数上下文长度为 $k=2$ 而堆上下文长度为 $k=1$。</p>
+<p>但碰到递归调用时，上下文会无限的增加，此时需要视上下文为队列，并限制队列长度$k$（因此此方法也叫 k-CFA, control flow analysis），实际应用时，$k \leq 3$，且函数上下文长度和堆上下文长度可以不一致，目前效果最好的是函数上下文长度为 $k=2$ 而堆上下文长度为 $k=1$。</p>
 <p>那么特别的，</p>
 <ul>
-<li><p>1-call-site/CFA 可以表示为 $Select(c,l,_)=[l]$，注意到 $c$ 被丢弃</p>
-</li>
+<li>0-call-site/CFA上下文不敏感；</li>
+<li>1-call-site/CFA 可以表示为 $Select(c,l,_)=[l]$，注意到 $c$ 被丢弃</li>
 <li><p>2-call-site/CFA 可以表示为</p>
 <script type="math/tex; mode=display">
   Select(c,l,_)=[l'',l]\\
@@ -476,7 +479,7 @@ Select(\boldsymbol{c},\boldsymbol{l},\_)=[l',\dots,l'',l]\\
 </li>
 </ul>
 <p>可以看出，$k$ 的值越长效果越准确，但是效率越低。</p>
-<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>如下图所示，蓝底代码为待分析代码，注意代码中没有store和load语句因此不需要看这两个语句的处理，并且不考虑heap sensitive：</p>
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>如下图所示，蓝底代码为待分析代码，注意代码中没有store和load语句因此不需要看这两个语句的处理，并且不考虑heap sensitive：</p>
 <p>初始化阶段，<strong>处理<code>main()</code>函数：</strong><br><img src="/pl-静态程序分析课程笔记（指针分析-上下文敏感）/image-20200902201538441.png" alt="image-20200902201538441" style="zoom:60%;"></p>
 <p>将 $[]:C.main()$ 加入 RM 集合，因为函数存在new语句，将$\langle []:c, \{o_3\}\rangle$ 加入WL；</p>
 <p>循环处理WL，<strong>处理$\langle []:c, \{o_3\}\rangle$</strong>：</p>
@@ -585,11 +588,19 @@ m' ,& \text{if } c \text{ contains non-abstract method }m' \\
 & \text{that has the same name and descriptor as }m\\  
 Dispatch(c', m), & \text{otherwise}
 \end{array}\right.\\
-\text{where }c'\text{ is superclass of }c</script><h1 id="Related-work"><a href="#Related-work" class="headerlink" title="Related work"></a>Related work</h1><ol>
+\text{where }c'\text{ is superclass of }c</script><h1 id="Related-work"><a href="#Related-work" class="headerlink" title="Related work"></a>Related work</h1><p>在北大课程中还介绍了两种指针分析方法</p>
+<ul>
+<li>Anderson指向分析[5]，复杂度$O(n^3)$（n为变量个数），也叫 Inclusion-based，本课程介绍CFA与之类似；</li>
+<li>Steensgaard指向分析，复杂度为$O(n\alpha(n))$（n为语句数，接近线性时间），也叫Unification-based。</li>
+</ul>
+<p>还有一种流敏感的指针分析算法[6]，其利用部分SSA做指针分析的优化，提高分析速度。</p>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ol>
 <li>Olin Shivers, 1991. “Control-Flow Analysis of Higher-Order Languages”. Ph.D. Dissertation. Carnegie Mellon University.</li>
 <li>Ana Milanova, Atanas Rountev, and Barbara G. Ryder. “Parameterized Object Sensitivity for Points-to and Side-Effect Analyses for Java”. ISSTA 2002.</li>
 <li>Yannis Smaragdakis, Martin Bravenboer, and Ondrej Lhoták. “Pick Your Contexts Well: Understanding Object-Sensitivity”. POPL 2011.</li>
 <li>Yue Li, Tian Tan, Anders Møller, and Yannis Smaragdakis. “A Principled Approach to Selective Context Sensitivity for Pointer Analysis”. TOPLAS 2020.</li>
+<li>The Ant and the Grasshopper: Fast and Accurate Pointer Analysis for Millions of Lines of Code, Hardekopf and Lin, PLDI 2007</li>
+<li>Hardekopf B, Lin C. Flow-sensitive pointer analysis for millions of lines of code. CGO 2011:289-298.</li>
 </ol>
 
     </div>
@@ -646,8 +657,8 @@ Dispatch(c', m), & \text{otherwise}
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/pl-静态程序分析课程笔记（安全）/" rel="prev" title="静态程序分析课程笔记（安全）">
-                  静态程序分析课程笔记（安全） <i class="fa fa-chevron-right"></i>
+                <a href="/pl-北大程序分析（SSA和稀疏分析）/" rel="prev" title="北大程序分析（SSA和稀疏分析）">
+                  北大程序分析（SSA和稀疏分析） <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
@@ -700,7 +711,7 @@ Dispatch(c', m), & \text{otherwise}
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Problem-of-Context-Insensitive-C-I"><span class="nav-number">1.1.</span> <span class="nav-text">Problem of Context-Insensitive (C.I.)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Context-Sensitivity-C-S"><span class="nav-number">1.2.</span> <span class="nav-text">Context Sensitivity(C.S.)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cloning-Based-Context-Sensitivity"><span class="nav-number">1.3.</span> <span class="nav-text">Cloning-Based Context Sensitivity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Context-Sensitive-Heap"><span class="nav-number">1.4.</span> <span class="nav-text">Context-Sensitive Heap</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Context-Sensitive-Pointer-Analysis-Rules"><span class="nav-number">2.</span> <span class="nav-text">Context Sensitive Pointer Analysis: Rules</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Domain"><span class="nav-number">2.1.</span> <span class="nav-text">Domain</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rules"><span class="nav-number">2.2.</span> <span class="nav-text">Rules</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Context-Sensitive-Pointer-Analysis：Algorithms"><span class="nav-number">3.</span> <span class="nav-text">Context Sensitive Pointer Analysis：Algorithms</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pointer-Flow-Graph-with-C-S"><span class="nav-number">3.1.</span> <span class="nav-text">Pointer Flow Graph with C.S.</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Algorithm-with-C-S"><span class="nav-number">3.2.</span> <span class="nav-text">Algorithm with C.S.</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Context-Sensitivity-Variants（Implementation-of-Select-）"><span class="nav-number">4.</span> <span class="nav-text">Context Sensitivity Variants（Implementation of Select()）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Call-Site-Sensitivity-k-CFA"><span class="nav-number">4.1.</span> <span class="nav-text">Call-Site Sensitivity(k-CFA)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#举例"><span class="nav-number">4.1.1.</span> <span class="nav-text">举例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Object-Sensitivity"><span class="nav-number">4.2.</span> <span class="nav-text">Object Sensitivity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Type-Sensitivity"><span class="nav-number">4.3.</span> <span class="nav-text">Type Sensitivity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Experiment"><span class="nav-number">4.4.</span> <span class="nav-text">Experiment</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Propagate-AddEdge-and-Dispatch"><span class="nav-number">5.</span> <span class="nav-text">Propagate(), AddEdge() and Dispatch()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Related-work"><span class="nav-number">6.</span> <span class="nav-text">Related work</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Problem-of-Context-Insensitive-C-I"><span class="nav-number">1.1.</span> <span class="nav-text">Problem of Context-Insensitive (C.I.)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Context-Sensitivity-C-S"><span class="nav-number">1.2.</span> <span class="nav-text">Context Sensitivity(C.S.)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cloning-Based-Context-Sensitivity"><span class="nav-number">1.3.</span> <span class="nav-text">Cloning-Based Context Sensitivity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Context-Sensitive-Heap"><span class="nav-number">1.4.</span> <span class="nav-text">Context-Sensitive Heap</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Context-Sensitive-Pointer-Analysis-Rules"><span class="nav-number">2.</span> <span class="nav-text">Context Sensitive Pointer Analysis: Rules</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Domain"><span class="nav-number">2.1.</span> <span class="nav-text">Domain</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rules"><span class="nav-number">2.2.</span> <span class="nav-text">Rules</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Context-Sensitive-Pointer-Analysis：Algorithms"><span class="nav-number">3.</span> <span class="nav-text">Context Sensitive Pointer Analysis：Algorithms</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pointer-Flow-Graph-with-C-S"><span class="nav-number">3.1.</span> <span class="nav-text">Pointer Flow Graph with C.S.</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Algorithm-with-C-S"><span class="nav-number">3.2.</span> <span class="nav-text">Algorithm with C.S.</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Context-Sensitivity-Variants（Implementation-of-Select-）"><span class="nav-number">4.</span> <span class="nav-text">Context Sensitivity Variants（Implementation of Select()）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Call-Site-Sensitivity-k-CFA"><span class="nav-number">4.1.</span> <span class="nav-text">Call-Site Sensitivity(k-CFA)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example"><span class="nav-number">4.1.1.</span> <span class="nav-text">Example</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Object-Sensitivity"><span class="nav-number">4.2.</span> <span class="nav-text">Object Sensitivity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Type-Sensitivity"><span class="nav-number">4.3.</span> <span class="nav-text">Type Sensitivity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Experiment"><span class="nav-number">4.4.</span> <span class="nav-text">Experiment</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Propagate-AddEdge-and-Dispatch"><span class="nav-number">5.</span> <span class="nav-text">Propagate(), AddEdge() and Dispatch()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Related-work"><span class="nav-number">6.</span> <span class="nav-text">Related work</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">7.</span> <span class="nav-text">References</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -719,7 +730,7 @@ Dispatch(c', m), & \text{otherwise}
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -745,7 +756,7 @@ Dispatch(c', m), & \text{otherwise}
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -957,7 +968,10 @@ Dispatch(c', m), & \text{otherwise}
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -59,7 +59,7 @@
 </script>
 
   <meta name="description" content="用法java动态代理机制可以实现使用一个抽象的中介类对任意类的任意方法进行进行代理，大致原理是运行时生成一个代理类，代理类再调用委托对象。创建委托对象的接口1234public interface Sell &amp;#123;    void sell();    void add();&amp;#125;">
-<meta name="keywords" content="java,动态代理,反射">
+<meta name="keywords" content="java,反射,动态代理">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java动态代理学习笔记">
 <meta property="og:url" content="http://anemone.top/java-java动态代理学习笔记/index.html">
@@ -220,17 +220,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -401,9 +402,9 @@
             
               <a href="/tags/java/" rel="tag"># java</a>
             
-              <a href="/tags/动态代理/" rel="tag"># 动态代理</a>
-            
               <a href="/tags/反射/" rel="tag"># 反射</a>
+            
+              <a href="/tags/动态代理/" rel="tag"># 动态代理</a>
             
           </div>
         
@@ -496,7 +497,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -522,7 +523,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -734,7 +735,10 @@
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

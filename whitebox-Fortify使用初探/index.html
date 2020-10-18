@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -58,18 +58,24 @@
   };
 </script>
 
-  <meta name="description" content="文章发表在t00ls上——https://www.t00ls.net/thread-53464-1-1.html，这里只做归档。">
+  <meta name="description" content="使用方法GUI入口如果有GUI，直接运行ScanWizard，按照步骤点下去就行了，结束后会在项目文件夹下生成Fortify{ProjName}的bat或sh文件，运行即可开始扫描，结束后会生成Fortify{ProjName}.fpr文件，双击打开可以查看漏洞和检查报告。">
 <meta name="keywords" content="白盒扫描,源码安全,Fortify">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Fortify使用初探">
 <meta property="og:url" content="http://anemone.top/whitebox-Fortify使用初探/index.html">
 <meta property="og:site_name" content="Anemone&#39;s Blog">
-<meta property="og:description" content="文章发表在t00ls上——https://www.t00ls.net/thread-53464-1-1.html，这里只做归档。">
+<meta property="og:description" content="使用方法GUI入口如果有GUI，直接运行ScanWizard，按照步骤点下去就行了，结束后会在项目文件夹下生成Fortify{ProjName}的bat或sh文件，运行即可开始扫描，结束后会生成Fortify{ProjName}.fpr文件，双击打开可以查看漏洞和检查报告。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-03T13:22:18.427Z">
+<meta property="og:image" content="http://anemone.top/whitebox-Fortify使用初探/1570934969767.png">
+<meta property="og:image" content="http://anemone.top/whitebox-Fortify使用初探/1570935982602.png">
+<meta property="og:image" content="http://anemone.top/whitebox-Fortify使用初探/1570935962839.png">
+<meta property="og:image" content="http://anemone.top/whitebox-Fortify使用初探/1570954530446.png">
+<meta property="og:image" content="http://anemone.top/whitebox-Fortify使用初探/1571804597569.png">
+<meta property="og:updated_time" content="2020-10-18T03:55:32.901Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Fortify使用初探">
-<meta name="twitter:description" content="文章发表在t00ls上——https://www.t00ls.net/thread-53464-1-1.html，这里只做归档。">
+<meta name="twitter:description" content="使用方法GUI入口如果有GUI，直接运行ScanWizard，按照步骤点下去就行了，结束后会在项目文件夹下生成Fortify{ProjName}的bat或sh文件，运行即可开始扫描，结束后会生成Fortify{ProjName}.fpr文件，双击打开可以查看漏洞和检查报告。">
+<meta name="twitter:image" content="http://anemone.top/whitebox-Fortify使用初探/1570934969767.png">
   <link rel="canonical" href="http://anemone.top/whitebox-Fortify使用初探/">
 
 
@@ -220,17 +226,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -299,7 +306,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-03 21:22:18" itemprop="dateModified" datetime="2019-11-03T21:22:18+08:00">2019-11-03</time>
+                <time title="修改时间：2020-10-18 11:55:32" itemprop="dateModified" datetime="2020-10-18T11:55:32+08:00">2020-10-18</time>
               </span>
             
           
@@ -336,15 +343,191 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <div id="hexo-blog-encrypt" data-wpm="抱歉, 这个密码看着不太对, 请再试试." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <div class="hbe-input-container">
-  <input type="password" id="hbePass" placeholder="" />
-    <label for="hbePass">输入密码，查看文章</label>
-    <div class="bottom-line"></div>
-  </div>
-  <script id="hbeData" type="hbeData" data-hmacdigest="3946db7e573043518daa8f82f90c988c2c1035018074993beac17007b598d0ba">24cf14f4c89eafae7f6aaf5c3fd0468f66f766e30cbff21d883f6babf33f9f1899ce479d339500dd34001d6cee5f66baf25939a44680530e72967798b6d170f0860eb651aa175d850bc0252ce840dce1082a56fd55371edb5723339365ba85dc252af5d208f1c72bbe88d10f819137034f0e0334a7627a1ab4bc9e742d12bc24c2ef5c347dd91df4c0a3ae41faf911eb79a1d5cd5d5fcc0a35793ae220a23c658f79d47d30be438e95b3fe5c317c5c0bfdc1743a9d3861c3bc94f9bb6caadaedd43d3215fbd4ba3c6e556610dd33834acd38034981fd141c7dcbec28cf90b72de1a621dd3918341380994b25b3d16b7b20c698c408950f2afe47529dc4fb8bfd381ab6c670f3da985841153ef1fa781716bc5a78ca5965b2ebf8d448072fba53be10fbaf92e10148a6c2caba9d18e370eb65acfb4e39ba946c7e52a0938fc31a357776b98f72a303f9ffaa796944ce6fcc1d789eff50d2d857737b4b96a5832634a26afaf13b7c3595dcf83380e49b4d38f44ceaff5a48af492cb351a132b8f773b6040fc7b6a76d94cf9320a189e3667c68e902ab83a43670c6d1c6c100ad0789083ec7c6db930990e2599bb6c17df5ab52d1f3a2dbe5f71556471ab1f4f6bfa660d4b48ef7e22d69fce901fc77346f7131305894f60f9f13dd4c94315c1469f24ba71c09d58634189121db6b5d08b362b6b54989e22e53180aa26a1398d6b2990bb10d430f6ee910ef61543c3e1f57e215bf6b0819b6fdc6b28b1ac1e877d85dc9c5300bf3d5e0cb8be55bbfbeba6015955ef7f227bf8dace7eef01c597bc68becb96356c9328c43dd5a45df7a7c3b5b806b8c359956c91d60ca99f3c7039c757a4ce1899862c2f56a944d3991c786e962c7f5d2e7c30db551953f03bae3c7ee7519eb4a7388c8df1d000a444de31cac028cb611ff9bec5b1aa71a0e3d9cca265d81f017f00024d85a8d40dcd55140212049201d306dbe3dfbfa25c1ca926c054fe319b8dc9ae90ec069a44a14cd759a9f76d0218c309f06bfb4c100d00e9cf6f271bae91437e72b6ebe58d6392f0bba298e04e221131f4264c53403c65c1cd3030ab19f93a26856503e35f3920ec5102f107b6e0c21b4421566a5be0df719bcc3bd7879cde08f5326c348b9791388116c2a689f8468a6699e9ffb41522a66a325cfe4e74b3b079aa198ba429f211be9603e20352887857db25c97d431ecfb29f746beee2e9c308f98267f677a969715b6838d20b25580edf7bc58898e3d86e0c4d7c7a3882de056d42b97727ff24a04e8b18a171c26b9fe45aa7a95f4ea91e248b9c298ae89640e6ac660111554c8a7350391d6c41f9caddeca5fc43e31821eb879fceaedb734dcee4bccbbbe136464aa9ae410c2c32733b2a300c1d767850d435607cbff1e85af669d4e7d59dbd6f248dee66c267f48f20c0caa7b4c0ca2827a4297c38c9c34b5099e95b36a3f82d2a55b106a191666d5b1f3e180fd6ae6f0effb22611bf0cd07b6bbb020b4a6cc2e8ac5922a22bad8b66bc0478bef74304dae28a7f7afedb18c7ab1a74299c635c179644c466ff297a3df14d53da0c526e46a98ed77f1bff5b4118aa1934fd75d410cdd11c7a934062bcd3b052fd710238eea2de7b5370e9e9c205fb617a622d8ba24de6b40864c7f4505df5bc6ba4be99ae375690a28aef762e73c20b4d68b1068cd0a54f7c3544334b035ea897fd2096c9afc3d76f279a548be30966848ea3c32323a3db745be09b5a233fc722e7b1b9d806b130444f234926300cba2cee96b3b380d30680d831985d0ba832bb59f05ac81e742bd05cc8d39582bee7e832a39fac31042827f0094cdc1896ca2af153a069b53a8b1a47f1b77ee116338b1e51e8d1bf84f7c5175dc6a181cac87f903eec88dcf28a80f4cbc94c6bae8ba7a312879c4eba4143e827f8058c7e75a03204b68d65f9c92dd5b30accbd7a901e11270a3babfa52d5c8a0255c8854af246445e8e3c85f22aa6e438112258ab3f45cb84c2fe46cc886282b8f708e96b4719228aa50487abfcd522ffe7b496b09ccb0a3e01f8ee73abe13d32334ef9c0ca8e6adaeffa82d0ba268a7a770d87daf60d9978f1e2a97c0cc29298e06ce330d8a491edaac97e48e7fd0051516c14866c5ec7f366ebf627c6cdbd942bf4894c9bfe8f22bc7147a841ca4db79d914125a001f58e3ada7f051f6a03ee519c07745b90547b73706ed250d34fb1be5198171092995f184f19ccf613e6ab5ad5fece02c4605ba5be4925336f4091426d24f6e91eac0e5f30a93fddc03d77e0702a93a78b31c921773b77b03552b3e03bbfec679b73707a024f172217a2a22ef1cd4dc85ec838b630fb1d0ee15e1049f73ce204e250e1bbd868c0c4438c538fe84cb644126eccdb568f48f8c0cdf2639179eda54d49cd2269e400d074cb366f342d97997407d48c9f70a6712f09544872da9380ec6e7e6f0d519e01f4a43656c57f810cb4a5264251522d12c3b29d64cc3de3fab712d33708a2a60e1a9cde4e4954299a32395c0d9c70a15e59d9ac8402370f25d9ef84cb1279ea7c892a1a63b0f0d6fccc4bc9e9727119c766e19774c1a5673738700cb8c3066c89a1b00841b405ab169927589f46419fca814873142052cbfc7271f4d2ede45bc0f5cd3546678015c8565b4dcdb0021c82feaf5eddf472a376626671fe8200956c80451feda04dedb4b6cfbe498a308e1e532164334befcefeb4120a6f750f86c179069b1ebde22c713a2d09b193213609bf8d3b22e38940672f6eb180163d93da28339533fce7da156691a19dac67a6ed7e29d7a2b93552fd5b49adb456716e74e1ab957f5ebd87d6bd0b143b5bf4cf547816207024bad172d3f0f8200f937f5d09f10952aa1f431d3bca2743762cb9fd2921fdd707faf3c61317627999ef17ef2d868d88c7a77b884e52e836e1211228fe9a317bd21736b3c5b548b7ae20dbb3dffd078bd2c47b2a2764d8ec9458640fcc343b70f739a626f5554ef5cfca5cc625bb3ab4135d8fc9ddbeb941c93019f142af83f182c059b941274b58247d90519308653c95f96b76cedf99ccb8fe80851cc314d685276536a4e63a53c714d2a9215db81bf72bab579414b70470e3527d2e91d6a950ef52de87c31c42b470d2d561f80b12f6d01b044ef617f3d5b04e31f594f355f3342cfcf889f6257143ecca73c28053989b868e8ebe21057334ee7a4f744c375ac08ba0d1db5a0471dcafdd3d2ac38413147d2ab5711a03ac60efa6504d59ba6e59405ad832d82b9745b320ce6ea0f92d0d6e6db492fcd6f3c25d0ef95824c640c68967b307c86c9429b83fd9269be86bc88351cd4a4970212cdd320e130cccde1f60646a748c2594011bc5bb5f61da5891ef57d8af4af737511d8d65879be70058fbaf1c388bb218f5158e02ab7390be6f9f0fb69984e26ec17b6350e6c4879494442e16863da1c7af9c0a15f1a9552e8ed7def293221c44c87a186a9f0f1f172059f14ed8acdd6a17b1ce2c92c292e459125dd6352d328f75408e5d131d90cedcd815ab0669fe67d91bde736452f82557f2b987a835446099cc5b17915ccd19697252be768e6fba702db9738cbbbebb2e0301c33554d2a622c552c5e3d7419a89709dd0809665ab5c6e8a6ca37e1a396ad2cd4a9639ef2a122b733f58bbfb69fc752d1eca70c24caf62f38b8e3f39655d00d3056501453bda3fc05fb8d76e03f2daff8ce3ba562811cf223a21aee5a70b49dc9fd78af157976281a4ee719289845c718b46324f8b64c5f71206774a9cb925ccec33b9d2d5d15a3ea593d66b2794c8099fd3ca6fb49b61703c60cda3ff6e52c8663d5123440f881d0776caaf29a2533a96166aca2dbad6c2d92ce5dcfac04c23f6519c34c8469726b052456cf2be3ed6148edf43860b4e87f9165450c11b752ce694c4b005ac79f5dc1c28d3fcdf41fb3028994215479ae073892a95105e43ee77fb7d68bbe764a85e54b28fae8324415de861b65f2210ee16e050885ece1287051c27092f4cb61fd155200db6131d227f8ced4f3840b4d4e50f488d19fc50d5e72044c1dfe447cf183138a07fd027a270451f5c265b6edb385fc82f3987552eadba18c1be5813a5814e49ce378583fee12c04b7126a12e0931d871a830cb997b6b19e0a8d2dc0bb7b788a9ec445520a3862a2f3800610f73970e9d0c00b3c7c95fd0616a37af29725f21aded01656233336424321023ac4bc312961974344960cc353eb6c55125b79fb36e5de4d642ba8de7e654591ffbb8ae81fe18217155df4af3964b274b3845c12a3c8ea6ad11945c6de7cbd458ca3a46baa3ca1d22c9635c3bdc34bc6077fc8256a9d62b826eb23656ed1d2d1849ef87afa78dd9071655d6fbeecdd8e7e1ce66be77fa4d0a1eb8cc70e56a9c35c3329efac03282a9450486550fcad9083eaec1464595236ead925dee92fb90bb78c9564674c2a099aee21664beb03a3f98732dba1ece3352be762632732c0deb188c9d81eed046bad0b5a10917deb061bd75adb2f3ef0dc566b71c236b8bfcc1ec29143253aad005cf6d0b705116ea45468e1afbd2090ac8bcd7dbc96c0f85d68ab70e1d3913d1ae107584e540421ce4514a61e069cabb04516b4395aa9af3ae6b3ff85979bd7b9c3d9ac9575cef989fe1c3299b0106c82014c9efc90615dc6d6e59cf2bb31edb5dbc956637e062518eab449bfead414e93575ae96d6f9381bb95f802e5c3733b8c9e4b5269554888b0cc91e9b9c4e4d055896a2fd2ca4f3fdeb21deb19493d5c234bef98f7873b6c3730e36adc0e2f8b935c29dbfeb855b08210b4f33383e04006a477479b31c30777e51afe8d05f1f7726e76501cf38eabd454dffe61559e5ff5fa7d496f5de5b044a8c41deccae8e6accd469f5f3079a406867840a056fc81b33bc6c97848e89ed326448585984be0293346e13408388d9fc5577c9639506e6a215256cb7af0e5e3ef1de637723a73ccd08956fb0a9222baea89eae76bff60f909a6e384379dadd09d1ddbdc89523417abc34fb65cc42ceac53165d63508bebc434cc7ac3d9bebd3256335d11c377ea3d2c56a54ecc69551fdfc56402d6dd3573564a1ef3b66d0142833a61629cbaeae657ecb83adb6321f89b8f831e216aa1b8b3c3a441fb03a241e54da8ca39b43247f25e3b0d934c9d61d97097b8f9f859ca87540d426b4ba5f4a6360bdffe8b36478405f9f5f73a1f7dc44e3d815e926b85b6353d81507dbce87d2f0107231ab87add00e0a070d1865749bb83045527d62c2ef7c1f23b04ad4f0b34e96035485530f935d643c61651586544cf0cd1420106b1373b03be09f80659d3f29152a996866997fa62fcb899f2a1fc1b885da864fd60fedfddb72b1f19f0684afa66f37577902d95f9754d77dfcd15c7b60866913c7a8b1652cf6dd3017b754a9fb7fac41991129c574e57949d29e6d9b190acaf2dd53bb34cfa70f4c71147a2935cf1735fb2c319ea2adaef2b3cfb6035ce22320e25871a18b9b7e8c7446113c7c27fb96b04bfd3b514a39edf150ff57a17235468f4e6921c53db1c6f2eaefac245c804af4b507432c7551b9541fad1f0311b0981a3ebc5ea5ec2d207aac99b99c2203d3fef5ee3b0fffd6f01748481e0c445f54fe831f5fc9a4d73e9e867e189fbe74fba280c83a907acf32c8a3b7ebaf86bcf27e07ad976c956f9250bb827a8532a0b68550b13210579cc9042d62112321c692d752e4e4e97265e04829199f9d39431fe99b52f463c7a6c95b9e4b9352a1be92c4316c5f3b69cc215c6a3b3345505b09d387c7d149456151e5c4af2930c73340fadf28754e5cdfc8aa61508ac418e98de5d66a3f3e321fa1995cf28bc7ddf34383878068184608f8f2884867da212620def9f39379b10a7a579610298ad322151f8a631f815f8fb51bbe17f3160c010d7483efb8122426a04345de8c6a970ed78f57ee832222116c7c0d9fa93b239a33e02c4767bb6c1016f929098fa76da9cc16160f6ba94aabd97b5ce095c9d10ba81ebdfc9f49d1c6dde2687c015dd4829ce5a811dccd257c0b50fc29c2289ca8c32afa75359907f178d50c806807f6525e2e86178efb00d76655fb2e55bab6108d45f028efdf0dc59678b5c802e9600326a072ee7d92f2f2d7f90e89be416ff140d267e1fa6af362bc3b2999a8e19c38e404d0ff6b86ae9387b606cc2d8aa6aec01befa7a40cd5c886ee0f62fbc96d3e7db5962c6703abbcb10bb20a472cae495b0f40f6c8c67a81a312454363d18ee4bf5c760514d9f5a24c5ad5e93f4dd2797b8b9cce5cb77ffd4f0b40f0170c59d0e338ea169b78eb80048e918ddc4f45983cd25f0fd7a9bbd1af6057e18ca2f14184167b90bc6aa640ec3cab0e372089b65be245290d665b2aba04be6cdfa60fe1cdcea46e51ec70b3444131aa1373fc16693b29d8cdfc2cd6d5c23af44bed7a224ac6f6dcb60d2c3e4832d4eea1bde7500ff759d42571270f7e0933e59d32b8c019ff8ff732ee83f2b694816bc7a614a4b84a29e9b7f1c6448189b0179dc168104d1964c2bdee5eeb70d8c8beb3a07f358050d1a6dc2fc0e76c395dc8de47593707c4063a9098152684c6bc8efd3ed0b1a8551891515c73af6559b83744422d5b7ba5abb6fed10f891a7a85e4d875cfcc5ca911c38702134d134e6435a69370997cfade2590c30bb9c63994765aa36f5e19b4512b92813f63efea41e1bef4643e9881c0964b7db73f42a4825a10f4eff1918e61a991a08bbbe73ab8fe35da240a168628ec5d70c371db294bbb1aa60e6ef0d3312cea9a1e7195ae2be57c421b28168224591e41ac3e66b12d1edd0ae36a170de03a2d24897ab0a0e5169cb5f96f02af60c366e020c6f1fc4d91595625839eda411f0acdc39a9c6bf223caffa590994775ea2baaf159791d10ce3348229c06481385c06b753a66445e3aa89efaa75d2d804fdb34513480d8b27e20acb5748541dd97df1d5836c00543786a56183437f6a535025ad7e16ba989a5db0c5519a04ffb44d1243f688fbae987815ada509439984d6b29b1ba647c4f395d2a6f4b3af1c8e691059adf1d5eb0abb50efb24017887793469ef32b50a089b3ce9e2629ad55ef9fdb42fa59f0505e350bcd20e1751368f127bd74383cdf2085e43ebce8a0fab1f76e4af0c47d3608c8a03dadb0e1cc934b67cf7f89858248522f20d103035bbb3005e7de615f6b71862772a33375008a5796eedb69e8bc3e96b10ba14ec1b9e470d0eeaee65fc955b772ea8bc7b8ff6d88b0a34dbded5241715b2ec903e394c537bbd7154e0a476b53e84f03d754a2badb7b0bca744e780b07644e7f510fe075b16f5ad96fdc0fcde9fa85587a8d4d3beaf299f511ed9c4977914199a31404d707ad1735ea9c5df52b9493c25a848850368989b183a8ec668fb4e892b1aeee1e434f952b1b1dd7a2a7531662d80b2ac7dccd4f160201ab2fb0fca4b338313380ef5361197dcfbcec7f33ed34e4eeb5336fc77973a159cd809c8012b93665d825cf1c2a7b68b17c00cbbebd8398d54a4b58e6329c81bc6978334abc4b525d0354f20abc1b1eea4a3db90584431a412e3c46e7036587b501d94c1666adaf67277639a1761ab56b7f31e10beff5e0324b2936d444a5177d11cae2837918b9a82284ced0a54f39b3f829c0d8f7525ffa2bc243e0a3afef354ab36e747b757ee8add5ff38bf91b9bbb48aa846921689acae01874a986157a19e2de1d74e43c57148eed078c2adfddc1f8cec70e074e3a579ef22493d2edcf7c01a591826f759cd003d2f063fdb4a796f3b7acdcb8df49938fa9cee8310653f8731c260256c31b6c21fcf371ec3aeab6ef99fb2b1229b9a36b4ce19de67972b1dfbde53d598a8d92187fc6bb6b319b995c814c201b0d8fbbcf9378d948a51f4433037c610eed6c1c1ce24da3c034c8b2dd2f570cfad069acb9a394300fc5bbcefb64e9222f4f7a24bb16a0546b634559e23416d7fd4134ee7dbb6437d5d2fabd6fc1ae6d5b2f7f870ecdf4c33e46c46697a7ffc396c9d67ebd9eb4e6421a3f048e36e6c56984523e44c4bd52296762628e8a630826d0c0996a3cc533a1c4548199adfabf920ff69f3ecacef4c77675b1b77d40647753a590d802e9de6a71bb4d3f34f340489c3c5efbb254951ad234eac7965f7eea4d4f9df83b81b6c91974c47edb53153c193539c42aa77796837a8ccee4af95de0ff431563de7229e246b70ad25ec8a9071962382ae12d7847385a9467e441e00a54c707872d9d9de1a5ed28f87b80bc35c11b072739e6cead52393cfc7061512bbdeab4709d8ae0b88b5b4c6487a40b959d38c09791dae1dcd52cde9c3fa7ee7f14d8ae1bda910feec7026f1d1d6961162a0def5ef6557cdaa6a8accc260c1de92ce6dc691104eb3dd00fc050e7811f048c2ba34592b19c1f97422c5ed3125c62b9738f5348ca817bd9029db58c621280dac794c4b9224ef0277c07b3accec2771164fe7914ebbec084157f03ea549f27a476dd1c2d421abfd01df22e15c36423a8c38787c0aeee4056b4ce9a3ddc2f3f2315afe22fcc8455f7479ca96682c7746b0a5695ebac0842bb078dfba88c5f008182d3e25bcb23c6eef4f372f741949a95cec9ce10edd282e97a670d09cda8fb409ded39fa26b7f8680620dfafcd442b4d479361f3cef0a6847263185040547d51e22188a65c22ca9e85544d9f7ff1389930a596c02db906f0dfba4adab84c1d399d82fd4f8e1c9aa312da44570afd42c8c95948b4750a34bc4472bf0784f42710401a48dcdb09be789751d44825807487a33f62dfe47f684f490ff94046199879823b0347ce8fc9694887481593b01ff7825d8574899b527afcfe9a0232be40f993829a450b61798570efa2e0fead063fc62d5aa6047a0d36e5e4e1021dfaf0c9738a0325319d720c2632ef3d061a362f8a8c2029fe17bf07fbdbfcd5efd5a0149544714570422e1e1816bc1df3ec26b5e1c08b07c035a3d312de538b34419ce25c3fde26b88960e055692e77dfb9d2950c39e45ad988fbba6b6d5d66eb8e51e9930adf51ed907dd0d6072608192bc914afca07ccf6f2a1a8fadb7cf63f67d14b6f6d22627eaf1918c851318046fb154614d14617855f76dd21ddf8c9682e033aaa02be8178d2a1495f713257c6ff77d4a5d0f08b5840e90f094e4153e5e3d55ba1bf56e44d65e4b23966605e7ca7899f0c613dcab7e7f984eccdc36aa5c34bd7f5bac40321f0d544296462c1223c60d297ff01c5ac347943b3289ba82cd0a72b745c65f9901479db55bba04a7ced840a21799b872c47c5be8e9b886ef129ce987e962aa6ec8c13d9dc6724fac2c2eb2d2035d58c948636aa09e91768369f93403f6c04e5265cc6a2c3d10dc4ffc90ba65bd5dd8fb47569d386e20d00bba609ded0b094b446d73869f3abf0d4b5965c79376560225ed8ca845ebafa2e7d413fafac20cc0ab5528b9409bc133bb62b994ad07faf0b83d14a7bad1aba9b4a6d3f324da1eff21c4c7603939e04ad7fcc2781d121dd5b8a509798731122133b75f938b7b9a90448fe78cf63b0c961b2c404e832186dd0e82c7f7b125c072f786d0849cd1663a346ea4795f00d02d749f1152e93719f67e749aa76a7e0a9ca8b32f5004eb2fd64d003518bd132b9825acbcd1d7c7bab0b30cea3655c876e59ebe4fbceab9b5b4f8e5baf6085207fa532964cfab8fa7323f683a42cd1eb7b339771746d824b86c801c177e76143962557f3712a7d97370c2be90f845a8a3788a50e78b7cccc6f696b2badac4d83962897112f7a40dd371f4be1b4576f119f8e08554296881c83ac19d16856d1771c8210d76adca73076f9221a426c9525ea3897246d72140541c2ed6e12d29dc310726ae6238c79d8cc0fc7b70e3a76a137879cf6d0843f55d99e8811eae90560d43ca2033886e3c729764ce384fb7cd9484c658155aaad2bed799c11addc67c558f5393517fff5b5be7b85d55a2ba11e726c8679c72022e860efed645e7fc1d6aec8b5610f25edc0eb574e20ec47c275b81dec98aafc65137eee8fb820b36462dc1d81899b94178874f56758ec8a911449643446536579e7f79094b42576f3d5b588b43fbe88818ee34f026e6d276d1ec3790a89320ab08c30e174c89fd62a46929f6098842e77008d2e9bc0c404cdf5ac77bd01e17aeb06e8af6da1a103e2803b6c6426f6b1dcffb31d9bcd4651e19a83f56d652f5673da2b8f6dadbd3af51dcba7c42e04223c76a8a5b2e7d82e5bbc1c829f632ed7c28dde7f10a31efbf3dd7c10c0f2f85471d39684f6831116e259884ea7cfbaa7a7a674aff64af26c25a56221977098b11db1f7eed966e14e70f24ad75e39d5075fbc23b9731858c53cee6c7908f148038d9e11365d1106a82487b104d7436a2acb2421d2c5c3c51807c9a6573626ed4fbc02bb3141376181e2c88b6275f5900d60b3ea321ae73ba750cd93b97950c72422bae299e485ac1ccc8dc6e29880276ffd4f98eb9c3edc68e74d3c2663a8be68820a3addf03ece11ddbb6161d0daaeaaa269df14951f9aa59ccdc1f2ccd21d9169577b78ee342287624bc782985d7981387da806115c21d7289ef86602d8c6a5c53c1112b1f6479a25548f3168cc77f4557aa0f1586e9bcb1434ca12d3d2dd99b8f3948f291a1dbfe6f301f6e7af5bfe59cc829ad4a1495912bc1ab5ebc8ca804a01118cf004a3c6227598e842fff0fff7f94a4c3d83d4f47aa1ace06929b668769076dce5cdb60e3a22705c6c97227cd35bcbb0ed7d01d0cb77195210ab1b70e402f2181d017d37bd617f4b3074433d17ced9d4a6eac4e0b476cfd0411c815ab3385b3e14161d3e7d0b4046ec53126a99d7b1d8e24ff7c7ac460a684c53786eca66a478206013b299156e7f7319de554fa7ec6093325538fd7ca2b34a4b7e370c69bb23fae5bbb352735c9b5c31562a3fc51630a1b42b79edfc8db4ef1404f1a35320abd3dcc75322108a84380713fcb23e20907b014ae7a88c77ee802d7e1945fdffb9d89ec5b4d4b169af1f951807bfc7929aa9936c91359fbff101810f3e19d87c3cc3111db3746916e10f52b5f3ca3eecd29de87d630ab63731f43fc4a3ff955394a8c4597933a8a1ac07ef3199ba504e9c6c06b9f9690acb3a76077a53db3b32e5dc8b13ced70431fc4a0056bbd6d145de8def567f5eae8270c38521ac4d77da6fe2a2ba1bbd6078d262b0dcbb563f90237d15160f5864308a9083a3d155e346cae1f2cbbecde5cb5aeb31faf1b289a4380a69277e8952835021849e44a7a42d7f0d1db9e303de0fed42df62ec34ef3f73ded395cc783e31f0a4f32de19961872302716e6b0e88d177f01263b11f46279d273f57a1760c7fad594f088fe1d7377907f81e62524ae27705971af0259be54972b59f19c166cf0038759e4f61223315695c0d9acd3ee293ae0dcffd5db70ea540dcd85e6cf82f33353342f4710ed17bdb94b7fb0e6b51b473ecffe2000f619afd362aa5eacd3b80ee8c47e918d8e0cec5e30f63f99245477e9efb8dedb26185c03029bdfd5bb2299ad1f9e8ba9e83544b07644e20b90e556e48f51a6116c925c412a710752226c025d2aec1afb652438a1dd006097066f67e914688c8ae5c9410cb9505c6ad14e0e849fba27c5b51334d220bd0e3d9a9b07338157c7093f4b1cda79b5c3536bf0fdbd4b898af12af3265d74b5896adb865a6b0c6a39ecc508a66f7bc95507609514de05a4b5c760167a3190d95ee956b9d77624f80abba673529ce97f129748aa3226ef036d55cf31c1c4398d6adcbbd033269ceaf9977716a2090166bc887a5a802b67777da627ebfaa5f14c5a010cea2d1b2d6f2c271d3e02070d172759c58d041fdbb3bfaea0a177576dada182b36a5a2060b44068fa263a89b2ffd4a6217f9ff4c5422203c50252a5dffa7839526913cd8a68dd924db511ab4bddb93befea69b4381ba9230aa4a85a7aa03a788d70702c4d7965f82ce2ccadcd9e7d2926773d4cba91b717ff1de03f8c0535efaaf518120e170df11f50acf90f4ba1cc88b78f51a6c7ac9f24b024b78894b0199961f818a100decc0899a20a4d6261f30bf2169e4ad8f70a5001d065ecc259ede507ac4e751812ca98d70edc819a7a9da2fb456387f5a6991d7a0f66b2b3e61bce845dbd3863a12877501a1b53d018dbfe04bc99f2d5edaabea2250ea9441efadc1bc188893f29dcc31dc9b3557b035a8e72e737ee0f85160c6d091fc012eb8859861cf5a07525cdc0e28242f274344523f6434d6178e0c3cd881f5b08ff5e98f8f12c0436f6a7cd945753cbf31a2fbef9f46b58ebd81073a81722e6a46815ae1823b18c1ae7e68555c4770ed3b5b3b3edf17fb22a11a70d239d815b7f870c70bc966e278168fb62b60e9701c35f24d0b693e1a278b2972fb9f2d07c5b0c3329cf28c2d127a6217cb5db869a697d6211af1d824315b11670e5552d60a171c74ff663bcfc52b2f5f6d15a8d25c338839afba95b2b13dd41a309791f4e80bb33181db30cdebd4e9dd6713b20e109d2ac71b51258a9551f7d9464ebd0eb2f9aafa5aa5a5394f60c312cc2e32a1f2f8a99875c0cf01ea6a9de736d92d3dceada2e0ae1896bc7be517361943e3cfc9e18907f9fbeaf113386a6f54625e0e0787692f2192629884be9e3adcc22d7e57b6faab34e5ca0b7372f741b6e11a09c612e6a022e8d1a1a75b12c99b951412cd78979f799594f1c1a8a52117df964725b8fe2857df21d605c5ab3032d39961688f13fa1c460bbc26c60efa921cef1c1b06179599e3e7650f687f9c6c67e20e25fba6222c36933d4813a19d20f83da7958e80b0001d293795122c3e6aa7cb21bfaf76bb860c15f0800e660e8f6f8007de0dbfb3c0b6d89680334847a72d9e5b0ddb2af8e3e8af294f72ba2737a5580dd518c35f0f281e71bbb3ee324bba897dfbd5ccbe68217ee1e9ee1b26929a0e7586f8674202ae71a1bdf47c1f14834d62d573afd5e31ef5cf01c1ba2d9ae39cc9e16b28bf39adf961b4abff39ee0b6f0680c4edf84b90d4a9d7fd1c3c30ce1fbab3680673650fb7fc6f9e2438f3c46e58e789c205761bb4bd4f7d44b91d490d6edaea5829cb7d816a2807858c68146b53b0bda710ce4be250a2c85dced456c06534ffcd29e6d119bc444573c641df86de9ae753eb5ff44f06d7e2c7ea7ffbc9c94ed919a6f11b0744b6fc2450cd0d16ca7c701687b1306aa4dc8806d098b0dafd324e2689102f59c31854f4ac1247595a0942682df1e36e0f12ef2a166aad81239f547f11ee3f643e2542e31f9bd8cc68ad792f271d2a2e0aea5b39287097586265b880d232f7c05547eae05c6680e146d45c478975e8c5d502cd7bc9a1ba2260ef66eb0924d358a02e74cc41a4c9af47d2e86ec58f400e69118a3edf09ecbdbf70d58f618fd88ba0722a4c470b0f8e45c93d8482714fc0762563e77cf5e68730d60d98dd00bc4165addd23db7d0c8fc411eeadbbfbe86e8dd4c45d1c22bb985ae4e70f0c52597f095d4b3fa7a95376d196f25c3252ab17d25da3bc529650f88223289e421b19978a2a907161d0e607fcb2462450b56c603a3c94f39000e907b348a4563b2eb1d6fb24657a925954c154ac1068e980c303eb3b63eeb5c71b2d06e49bfe0e875b7582373fe54acb0d7174866d55e23e9a45686071cbfa817d7e8fa18738515e6317eb6c39fbbdd64b277aa2664e1f0d3882fa4d141bf2554ef685cf0e6bb4431cb655aa90f461d63c3ccc55e6d9106cf2ca1c751cce15cf92700f868d5ef2afe97589ebc767db4396dc16bb4d9c1166aed962b0b58fc6b6c87fe830e47a5f1828da3fcec924aedc673d0cc2905b5afb6b1fa8edd2f2d00e8b080727ab18512d2725cd71f1bb97c59d0279c06d56f7972bb1e5a04a0e7f02817326760004578c1385ad05f36f4d12708ec2bb24c91670a94309f0754db5bf2359ad71993a775847111053b162dc9ff9d96eaa7e3cc571aab3c6b2f80a5d3810bb49e523dfe8a4c2d094f10ba66f8e7fb9a1921985b8d429fca8935c0c0fc4583d91a37b878d3b5e94500261b625757cd608ea9af0d0c2c5a718914740cfaa277c1e282d793d00ea0bd9e3adfc5b7bfabd8f6844e8c4054c051ae16e3a2228ae60f001f362897586d30b00947fba25725922782c742c21a035bc733f534aa55466c264f505d1d0fa237994aad4a44e1fcb577cec769d62de997ee2e8b5d2d664476b2fccc71dea09e253f60edfd291e016fdff50745d11a5981c97661db76c76c0589bc394851b0077abde0a09f6527f8281da212e6833b4e77af7f090630f3f336127ba81c5c33f49eea14d1f93974f3dd5ad871f95d023667b45bfe482fc3dc615422a916256734ccd9a218e589b897bdc3d085a1df2cd61263ffc23a81dbc6699019807c4fd69338812d617a253b9d05f095cc498f912006a222cf701d057d02609238fd3d5a022b076b2ccb84f607674bd2d3e68d887b18d047fcb0a8dac076a07d4877a64df56d715d7f0f594c04b1e3619758c56f6027aca599359fc9fe87d831f46be52836fe6573d88bd1f1424c8f8d79f41b645baa6f3242309556c44e78ea1d6bb6f34bfaa1453356d2d5e60bf877938a82524ec15e0dc79a33e953b4652b24078ee9f316c157460531118d78530dd2671c15305f98d7711897369c021a9642f604f93aeacbb20983adeafc55ee975f1cf51c5d067dc4426dd2f3c8c155477d93c4d98477ae3eff9ec662abd4dc9a71257ad9e744b46fc136dd9ad70a2ab3d9e6336eb6e68a073795b94ca19391d484cb0dd35246df0cfdcb105bfba55e4def9fea7fc4d1b2e37966bcc0ac762a3814296ab3d7ca7b72ea9bdc0b93d3ac25665397a6879462a29138c1d8e3f48f1d8fe7356417da7d978a144208651671cd333919ff0f3c7bd721926aa4b6e1a21cf1b69eb8da918b396829cc87e9bac36f6ff5f9e2908d4d1a50e52a8b6f0556778ff711073f70139403f98e99cc8b68c036963bbac60462e2877501418bd40c679867ca50acd840fc0d72491a73a05ced17ef68bbb4b0e0c7a6e190529808981ff596f15559961e094651dd13b5a43db073e53535f3f83280f120d41c62b6c9dc5c27d3ba49b97d3b137d1635d4b12fae748fe3c793ecaf3a9046cafb20d4e04b3c758b83e249ac60852a63eea96e8fc3d599bf78e975e1eb3f0d95c32c91e6aebf72b73634eb0824d5db7634e1af030f5bd9b882a1c027ba12174228a14aac75b83d8c09e611427601a55ad552e7a52823b553b95fbea3078d47cb3de207518b6076328cb3c8e831465311209beca53a95049b163b1ab252cf3b1209832ade28abe3da406c625876aaf728b8933d8e3d9acb2b1ab4a5c6fb742016a3f36f17a2d6d9c85c765726e9c5c307e60d0dfa88321107b74d4377ea3cbc0a5a6078db705743bb7a945885cfc62fcafbfa370d4231c916f3af4cb6347ac8ff3c90b6ae3bbd31171bb8a61b0f2ca526f96baee7a945d1802cf57ca2da1120ac4c6ca14704c6af9cffb018c283038aebcf4e4e4ad766ec0fad7c3876cef0911c83e316eb0ed2b11f27ed0925c2b4452cb30407ef3420bc86af977f4a20fe418b2b5203f1cac4ac294e4402663ec6f78443af91d78ee09c27bd93e83be18ec24c3867fec5d9f14091910b9d30003fcb921fb2a670744a5a5da1112d89d5d80753c727f1055b72b46f478b96d43ad299c8eb978aeb6132c2cb7c2b4297d488ef4063dc50fd96f2255f0dab7304a45c5aaed266afbd978b4cb02686cf87a3c6db14d8e42e7a8b011c7e108814e8b4684b22edde2d7144bde714f8a15d84d3b07622cbb85b3e1800661c9930009d03dc60ea94c8cb9d0402d29d2fdd3bfcd1f3d946a3832c72b3cf92b1efb13a4ae8687ccac4a19d03135d4889a82f4245b1999c8d0a8df05a6ac1d5256ee3205495c7fa1aebbfb3b4e513b70ffba16378007ada3f6767cd9ed36ba4d9dc63c991bc2f2ab0b8787c2808d0cfabcb877106531d2bfec653abbaa72bdd81ff7316deb30dd2f470faa67612f0fca776e17ff3f6624b0c4ca7e073f14dbcc7d052924e94f9a32ccb2509762b5531e183aa431bf4ab685a5250cd53f876784e8831bb9a0ecf49d439b2160522126d630d446693dd3ab8358811681b1155f2eb7be5b6ee3528bcff4c5b8228e1d472466ad662fd87ef1888af1a8108a719ee598eaf88d40c517f580a2dcd27b0b790ff489a1f247859c07215c71b421fd1eb04e436f6530398d099f776dcf6566907a2929501a362c630814e2ca7479ab6416e69b0a0a891ebeb3272d1b6a7b2d0084404ee19d373fabc9ee3643916cb0e72706df9f8c4314fe966576d9e18ad58f80ff56d6c9a724a70c92b16b62d07df199b9b01f9c774abc0704250f178accab78c91707286137fda23fb93e9efeb4ac99724e157bb6461bebf1955f51569755c3bd0cc49477572584278ae0eace81dc78c2ce5a7ea5b1ed04d2834fd2fa3d67882d49963d6d532ff091d0ec52723ef95a9e3c8293836afa1e94c488b2ca3e7aa56a20d193f9571da906e2227d324ffbb9d8a160aa942e03ea587009eb86a4c45b3fc4de6b3fe00e73ec1298d9b2e36d4976899614894ebcc1002cde3e4157aef982b46c6d880230dcbf1509f835256055bb058d6acbf775c2449230ce6b0ceba08385b29071feaa5a5c811447a2cd8c56daa747e11e7a1818fcf544f73039b79b3497e000b8b22b0b0fb303155aaec055f52fc6d058b91e55bb927ced8263a9af6ab572bd80804c37969845f3a85e4e9cd033eb04a69ade281c70c0f6820a81638d14ed702b9fe89ee10f1b968dfd664792ca4d61734bb5c9268e2618b6b5ee521a663ec4d548dcb3fce003c8c382eecc37c3f4f105c6d4b28cde36c95f714c4bb80e5e2ec133c2727709e5ee26102d97977da5ff8492c0071249d4359e48ffcc7242529ef8e8fa60ef4582376ebdd0b470184cde59ab9ee517630451</script>
+        <h1 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h1><h2 id="GUI入口"><a href="#GUI入口" class="headerlink" title="GUI入口"></a>GUI入口</h2><p>如果有GUI，直接运行ScanWizard，按照步骤点下去就行了，结束后会在项目文件夹下生成Fortify{ProjName}的bat或sh文件，运行即可开始扫描，结束后会生成Fortify{ProjName}.fpr文件，双击打开可以查看漏洞和检查报告。</p><a id="more"></a>
+<h2 id="Java项目"><a href="#Java项目" class="headerlink" title="Java项目"></a>Java项目</h2><p>如果是java项目，生成项目时会提示项目缺少依赖，如下图所示：</p>
+<p><img src="/whitebox-Fortify使用初探/1570934969767.png" alt="1570934969767"></p>
+<p>不能解析的类会严重影响扫描效果（见下文），因此一定要指定第三方依赖位置，但是现在很多项目采用Maven或者Gradle构建，此时除了手工指定lib目录外，还可以通过下面Maven和Gradle项目插件的扫描方法</p>
+<h3 id="Maven项目"><a href="#Maven项目" class="headerlink" title="Maven项目"></a>Maven项目</h3><p>若为maven项目，先在<code>.../Fortify/Fortify_SCA_and_Apps_{version}/plugins/maven</code>文件夹下找到<code>maven-plugin-bin.zip</code>解压，然后<code>maven clean install</code>安装到本地仓库：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">unzip maven-plugin-bin.zip -d /tmp/maven-plugin-bin</span><br><span class="line"><span class="built_in">cd</span> /tmp/maven-plugin-bin</span><br><span class="line">./install.sh <span class="comment"># win为install.bat</span></span><br></pre></td></tr></table></figure>
+<p>然后在用ScanWizard时第二步，勾选Maven，再简单配置一下maven即可</p>
+<p><img src="/whitebox-Fortify使用初探/1570935982602.png" alt="1570935982602"></p>
+<p><img src="/whitebox-Fortify使用初探/1570935962839.png" alt="1570935962839"></p>
+<h3 id="Gradle项目"><a href="#Gradle项目" class="headerlink" title="Gradle项目"></a>Gradle项目</h3><p>gradle没有图形化入口，怎么用见“CLI入口”章节</p>
+<h3 id="加依赖和不加依赖的效果对比"><a href="#加依赖和不加依赖的效果对比" class="headerlink" title="加依赖和不加依赖的效果对比"></a>加依赖和不加依赖的效果对比</h3><p>这里对比一下未加依赖和添加依赖后/用maven插件的扫描结果，用java-sec-code测试，从左到右依次为未加依赖(src)，手工指定lib目录(lib)和maven插件(maven)</p>
+<p><img src="/whitebox-Fortify使用初探/1570954530446.png" alt="1570954530446"></p>
+<p>可以看到再高危漏洞这里，不加依赖漏掉了XSS、PathManipulation和SQL注入的缺陷，并且在中危和低危漏洞方面的缺陷检出率也远低于加依赖的结果（注意到手动指定lib的中危缺陷比maven插件的多一个，实际上是在lib中有一个缺陷重复了两次）</p>
+<h2 id="CLI入口（只针对java）"><a href="#CLI入口（只针对java）" class="headerlink" title="CLI入口（只针对java）"></a>CLI入口（只针对java）</h2><p>GUI虽然好用，但是CLI入口更方便我们封装做二次开发。</p>
+<p>看一下官方的手册或者分析一下GUI生成的脚本，可以得知fortify扫描主要分为一下几步</p>
+<ol>
+<li><p>Extracting Arguments File，生成参数列表，保存到Fortify{ProjName}.sh.args文件中，参数报刊了java的classpath(-cp)，java版本，排除目录，待扫描的目录，由于命令行长度限制所以需要单独保存成文件，生成的实例文件如下(<code>FortifyXXX.sh.args</code>)：</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"-cp"</span></span><br><span class="line"><span class="string">"/home/anemone/all_my_work/whitebox_scanner/downloads/graphql_java_gen-master/support/build/libs/support-0.2.1-sources.jar:/home/anemone/all_my_work/whitebox_scanner/downloads/graphql_java_gen-master/support/build/classes/java/test:/home/anemone/all_my_work/whitebox_scanner/downloads/graphql_java_gen-master/support/build/libs/support-0.2.1-javadoc.jar:/home/anemone/all_my_work/whitebox_scanner/downloads/graphql_java_gen-master/support/build/libs/support-0.2.1.jar"</span></span><br><span class="line"><span class="string">"-source"</span></span><br><span class="line"><span class="string">"1.8"</span></span><br><span class="line"><span class="string">"-exclude"</span> <span class="string">"/home/anemone/all_my_work/whitebox_scanner/downloads/graphql_java_gen-master/**/*.jar"</span></span><br><span class="line"><span class="string">"-exclude"</span> <span class="string">"/home/anemone/all_my_work/whitebox_scanner/downloads/graphql_java_gen-master/**/*.class"</span></span><br><span class="line"><span class="string">"/home/anemone/all_my_work/whitebox_scanner/downloads/graphql_java_gen-master"</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Cleaning previous scan artifacts，即清除上一次扫描</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sourceanalyzer -Xmx14237M -Xms400M -Xss24M -b buildXXX -clean</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Translating files，即编译文件到中间语言</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sourceanalyzer -Xmx14237M -Xms400M -Xss24M -b buildXXX @FortifyXXX.sh.args</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Testing Difference between Translations，不是太清楚这一步是做啥的</p>
+</li>
+<li><p>Starting scan，开始扫描</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sourceanalyzer -Xmx14237M -Xms400M -Xss24M -b buildXXX  -scan -f result.fpr</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>那么提炼一下，最简单的命令应该就是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sourceanalyzer -Xmx14237M -Xms400M -Xss24M -b buildXXX -clean </span><br><span class="line">sourceanalyzer -Xmx14237M -Xms400M -Xss24M -b buildXXX -cp <span class="string">"lib/xxx.jar:lib/yyy.jar"</span> -<span class="built_in">source</span> 1.8 -exclude <span class="string">"**/*.jar"</span> -exclude <span class="string">"**/*.class"</span> &lt;ProjDir&gt; </span><br><span class="line">sourceanalyzer -Xmx14237M -Xms400M -Xss24M -b buildXXX  -scan -f result.fpr</span><br></pre></td></tr></table></figure>
+<p>特别的，maven项目：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sourceanalyzer -b buildxyz mvn clean compile</span><br><span class="line">sourceanalyzer -b buildxyz -scan -f result.fpr</span><br></pre></td></tr></table></figure>
+<p>Gradle项目:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sourceanalyzer -b buildxyz gradle clean build .</span><br><span class="line">sourceanalyzer -b buildxyz -scan -f result.fpr</span><br></pre></td></tr></table></figure>
+<h1 id="原理浅析"><a href="#原理浅析" class="headerlink" title="原理浅析"></a>原理浅析</h1><p>Fortify使用文档中介绍了其使用的分析器，这里给大家翻译一下</p>
+<ul>
+<li><p>Buffer</p>
+<p>缓冲区溢出分析器，可以显示数据流</p>
+</li>
+<li><p>Configuration</p>
+<p>配置分析器，用来分析项目中的错误配置</p>
+</li>
+<li><p>Content</p>
+<p>HTML内容分析器，除了分析HTML外还会分析PHP，JSP和ASP文件</p>
+</li>
+<li><p>Control Flow</p>
+<p>控制流分析器，用来检测潜在危险的操作序列。通过分析程序中的控制流路径，控制流分析器确定一组操作是否按一定的顺序执行。例如，控制流分析器检测未初始化变量，XML是否正确配置。</p>
+</li>
+<li><p>Data Flow</p>
+<p>数据流分析器，应该是最常见也是效果最好的分析器了。通过污点传播技术，检测用户输入（source）是否会传播到危险函数（sink）点中，一般的XSS、SQLI都是这个分析器扫描出来的。</p>
+</li>
+<li><p>Higher Order</p>
+<p>不知道咋翻译，为动态语言设计的数据流分析器，用来应对高阶函数编程而设计的分析器，高阶函数编程在动态语言（如python，js和swift）中很常见，具体来说即使用匿名表达式生成函数，而该分析器就要跟踪这些匿名函数的数据流。</p>
+</li>
+<li><p>Semantic</p>
+<p>语义分析器，用来发现不安全的函数使用，例如java被废弃的方法和C/C++中的gets()</p>
+</li>
+<li><p>Structural</p>
+<p>结构分析器，不是很清楚原理，文档中说其用来分析死代码，未被声明为static的logger等</p>
+</li>
+</ul>
+<h1 id="与Find-sec-bugs对比"><a href="#与Find-sec-bugs对比" class="headerlink" title="与Find-sec-bugs对比"></a>与Find-sec-bugs对比</h1><p>find-sec-bugs算是一个比较出名的开源java代码审计工具了，这里对比一下扫描质量，还是拿java-sec-code来比较，java-sec-code一列数字表示真实API数/安全API数，其他两扫描器列数字表示检出真实漏洞数/误报数，结合这几个数据可以算出漏报和误报率。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th></th>
+<th>java-sec-code</th>
+<th>Fortify</th>
+<th>Find-sec-bugs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CommandInject/RCE</td>
+<td>2+1=3/1</td>
+<td>3/1</td>
+<td>3/1</td>
+</tr>
+<tr>
+<td>CORS</td>
+<td>3/1</td>
+<td>1/1</td>
+<td>2/1</td>
+</tr>
+<tr>
+<td>Deserialize</td>
+<td>2/0</td>
+<td>0/0</td>
+<td>1/1</td>
+</tr>
+<tr>
+<td>Fastjson</td>
+<td>1/0</td>
+<td>0/0</td>
+<td>0/0</td>
+</tr>
+<tr>
+<td>FileUpload</td>
+<td>1/1</td>
+<td>1/2</td>
+<td>1/2</td>
+</tr>
+<tr>
+<td>IP Forge</td>
+<td>1/1</td>
+<td>0/0</td>
+<td>0/0</td>
+</tr>
+<tr>
+<td>Java RMI</td>
+<td>1/0</td>
+<td>0/0</td>
+<td>0/0</td>
+</tr>
+<tr>
+<td>JSONP</td>
+<td>4/1</td>
+<td>0/0</td>
+<td>0/0</td>
+</tr>
+<tr>
+<td>XXE+OOXML+ XLSX+XStream</td>
+<td>9+1+1+1=12/8</td>
+<td>6/0</td>
+<td>6/0</td>
+</tr>
+<tr>
+<td>PathTraversal</td>
+<td>1/1</td>
+<td>1/1</td>
+<td>1/1</td>
+</tr>
+<tr>
+<td>SpEL</td>
+<td>1/0</td>
+<td>1/0</td>
+<td>1/0</td>
+</tr>
+<tr>
+<td>SQLi</td>
+<td>3/4</td>
+<td>3/0</td>
+<td>1/0</td>
+</tr>
+<tr>
+<td>SSRF</td>
+<td>8/1</td>
+<td>5/1</td>
+<td>3/1</td>
+</tr>
+<tr>
+<td>SSTI（velocity）</td>
+<td>1/0</td>
+<td>1/0</td>
+<td>1/0</td>
+</tr>
+<tr>
+<td>URL Redirect</td>
+<td>3/2</td>
+<td>2/1</td>
+<td>3/1</td>
+</tr>
+<tr>
+<td>URL whitelist Bypass</td>
+<td>5/3</td>
+<td>0/0</td>
+<td>0/0</td>
+</tr>
+<tr>
+<td>XSS</td>
+<td>2+4(ssrf)=6/1</td>
+<td>6/4</td>
+<td>0/0</td>
+</tr>
+</tbody>
+</table>
 </div>
-<script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">
+<p>总体对比下来，fortify不是很占优势，主要区别在于反射型XSS——Fortify检测到6个而Find-sec-bugs没有检测到，SSRF——Fortify多检出2个，但这些差异估计是由于规则导致的，给Find-sec-bugs增加一些source和sink点就能够弥补。</p>
+<p>另外，Find-sec-bugs发现两处密码硬编码而Fortify未发现：</p>
+<p><img src="/whitebox-Fortify使用初探/1571804597569.png" alt="1571804597569"></p>
+
     </div>
 
     
@@ -453,6 +636,8 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用方法"><span class="nav-number">1.</span> <span class="nav-text">使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GUI入口"><span class="nav-number">1.1.</span> <span class="nav-text">GUI入口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java项目"><span class="nav-number">1.2.</span> <span class="nav-text">Java项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Maven项目"><span class="nav-number">1.2.1.</span> <span class="nav-text">Maven项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gradle项目"><span class="nav-number">1.2.2.</span> <span class="nav-text">Gradle项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加依赖和不加依赖的效果对比"><span class="nav-number">1.2.3.</span> <span class="nav-text">加依赖和不加依赖的效果对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CLI入口（只针对java）"><span class="nav-number">1.3.</span> <span class="nav-text">CLI入口（只针对java）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原理浅析"><span class="nav-number">2.</span> <span class="nav-text">原理浅析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#与Find-sec-bugs对比"><span class="nav-number">3.</span> <span class="nav-text">与Find-sec-bugs对比</span></a></li></ol></div>
+        
       </div>
       <!--/noindex-->
 
@@ -470,7 +655,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -496,7 +681,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -708,7 +893,10 @@
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -218,17 +218,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -280,7 +281,7 @@
         
          
           
-        <span class="collection-header">不错! 目前共计 67 篇日志。 继续努力。</span>
+        <span class="collection-header">不错! 目前共计 70 篇日志。 继续努力。</span>
       </div>
       
 
@@ -396,8 +397,8 @@
 
       <h3 class="post-title">
         
-          <a class="post-title-link" href="/vulnresearch-Solr_Velocity_injection/" itemprop="url">
-            <span itemprop="name">Solr Velocity模板注入漏洞分析</span>
+          <a class="post-title-link" href="/vulnresearch-Solr_DataImportHandler_RCE/" itemprop="url">
+            <span itemprop="name">Solr DataImportHandler RCE(CVE-2019-0193)漏洞分析</span>
           </a>
         
       </h3>
@@ -425,8 +426,8 @@
 
       <h3 class="post-title">
         
-          <a class="post-title-link" href="/vulnresearch-Solr_DataImportHandler_RCE/" itemprop="url">
-            <span itemprop="name">Solr DataImportHandler RCE(CVE-2019-0193)漏洞分析</span>
+          <a class="post-title-link" href="/vulnresearch-Solr_Velocity_injection/" itemprop="url">
+            <span itemprop="name">Solr Velocity模板注入漏洞分析</span>
           </a>
         
       </h3>
@@ -640,7 +641,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -666,7 +667,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -878,7 +879,10 @@
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

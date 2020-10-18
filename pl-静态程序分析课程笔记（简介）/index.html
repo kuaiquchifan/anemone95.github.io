@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -70,7 +70,7 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（简介）/image-20200802115612020.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（简介）/image-20200802154058197.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（简介）/image-20200802154239519.png">
-<meta property="og:updated_time" content="2020-08-15T09:46:31.427Z">
+<meta property="og:updated_time" content="2020-10-03T04:03:43.605Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（简介）">
 <meta name="twitter:description" content="母校计算机院的李樾、谭添老师讲的课，听了第一节课就哭了，决定做一下笔记，课程网站 https://pascal-group.bitbucket.io/teaching.html。PL知识体系如上图所示，主要分三大块，理论部分包含语言设计、类型系统、语义和逻辑检查；环境部分包含编译器和运行时设计等；应用部分包含程序分析、程序验证和程序生成等，本课程主要关注于应用方面的程序分析。">
@@ -225,17 +225,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -304,7 +305,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-15 17:46:31" itemprop="dateModified" datetime="2020-08-15T17:46:31+08:00">2020-08-15</time>
+                <time title="修改时间：2020-10-03 12:03:43" itemprop="dateModified" datetime="2020-10-03T12:03:43+08:00">2020-10-03</time>
               </span>
             
           
@@ -344,15 +345,48 @@
         <p>母校计算机院的李樾、谭添老师讲的课，听了第一节课就哭了，决定做一下笔记，课程网站 <a href="https://pascal-group.bitbucket.io/teaching.html。" target="_blank" rel="noopener">https://pascal-group.bitbucket.io/teaching.html。</a></p><h1 id="PL知识体系"><a href="#PL知识体系" class="headerlink" title="PL知识体系"></a>PL知识体系</h1><p><img src="/pl-静态程序分析课程笔记（简介）/image-20200802113608162.png" alt="image-20200802113608162"></p><p>如上图所示，主要分三大块，理论部分包含语言设计、类型系统、语义和逻辑检查；环境部分包含编译器和运行时设计等；应用部分包含程序分析、程序验证和程序生成等，本课程主要关注于应用方面的程序分析。</p><a id="more"></a>
 
 
-<h1 id="Rice’s-Theorem（莱斯定理）"><a href="#Rice’s-Theorem（莱斯定理）" class="headerlink" title="Rice’s Theorem（莱斯定理）"></a>Rice’s Theorem（莱斯定理）</h1><blockquote>
-<p>Any non-trivial property of the behavior of programs in a r.e. language is undecidable.</p>
+<h1 id="Rice’s-Theorem（莱斯定理）"><a href="#Rice’s-Theorem（莱斯定理）" class="headerlink" title="Rice’s Theorem（莱斯定理）"></a>Rice’s Theorem（莱斯定理）</h1><h2 id="停机问题"><a href="#停机问题" class="headerlink" title="停机问题"></a>停机问题</h2><p>了解莱斯定理，首先证明停机问题是不可判定的：</p>
+<ul>
+<li><p>假设存在停机问题的判定算法 <code>bool Halt(p)</code>；</p>
+</li>
+<li><p>存在恶意程序：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Evil</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Halt(Evil))</span><br><span class="line">        <span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>那么<code>Halt(Evil)</code>返回存在矛盾：</p>
+<ul>
+<li>若返回真，即evil可停机，那么Evil()走if分支，但该分支evil不可停机，矛盾；</li>
+<li>若返回假，即evil不可停机，那么Evil()走else分支，但这样evil可以停机，矛盾。</li>
+</ul>
+</li>
+</ul>
+<h2 id="内存泄露问题"><a href="#内存泄露问题" class="headerlink" title="内存泄露问题"></a>内存泄露问题</h2><p>内存泄露问题与之类似：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Evil</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="built_in">malloc</span>();</span><br><span class="line">    <span class="keyword">if</span> (LeakFree(Evil))</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">free</span>(a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Rice定理"><a href="#Rice定理" class="headerlink" title="Rice定理"></a>Rice定理</h2><p>经过上面两个问题，可以感觉到只要是一个判定问题，就可以套用上面的evil框架来反证这个框架是不可判定的，Rice定理对上面情况作了总结：</p>
+<blockquote>
+<p>Any non-trivial property of the behavior of programs in a i.e. language is undecidable.</p>
 </blockquote>
 <p>对递归可枚举语言来说，不存在一个完美（Sound&amp;Complete）的，用于判定程序中non-trivial的属性的方法。</p>
 <p>这里“non-trivial property”可以理解为程序分析的种种目的，如变量是否空指针、是否存在信息泄露等。</p>
-<h1 id="可靠性和完备性（soundness-amp-completeness）"><a href="#可靠性和完备性（soundness-amp-completeness）" class="headerlink" title="可靠性和完备性（soundness&amp;completeness）"></a>可靠性和完备性（soundness&amp;completeness）</h1><p>由莱斯定理，分析时出现sound和complete情况，存在两种妥协方案：</p>
 <ul>
-<li>Compromise soundness：妥协可靠性，即接受误报，该方案是静态分析较常见</li>
-<li>Compromise completeness：妥协完备性，即接受漏报</li>
+<li>平凡（trivial）属性：对图灵机（语言）P来说，要么对全体程序都为真，要么对全体程序都为假；</li>
+<li>非平凡（non-trivial）属性：不是平凡的所有属性，如停机问题、空指针、信息泄露等。</li>
+</ul>
+<p><strong>证明：</strong></p>
+<p>设给定函数上有非平凡性质P，假设空集（对任何输入都不输出的程序，包括不停机程序）不满足P，因为P非平凡，因此一定有满足P的程序ok_prog；</p>
+<p>假设有判定性质P的算法 <code>P_holds()</code>，编写以下程序判断程序q是否停机：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Bool <span class="title">halt</span><span class="params">(Program q, Input w)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">evil</span><span class="params">(Input x)</span> </span>&#123;</span><br><span class="line">        q(w);<span class="comment">//如果q不停机，那么evil不满足P</span></span><br><span class="line">    	ok_prog(x); <span class="comment">//如果q停机，那么启动ok_prog，此时evil程序等同于okprog程序</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> P_holds(evil);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面程序借用了P_holds的能力来判断停机问题，关键在于evil：</p>
+<ul>
+<li><p>如果<code>q(w)</code>不停机，那么因为不停机程序不满足P，<code>evil()</code>不满足P；</p>
+</li>
+<li><p>如果<code>q(w)</code>停机，那么<code>evil(x)</code>等同于<code>ok_prog(x)</code>即<code>evil(x)</code>满足P</p>
+</li>
+</ul>
+<p>综上，只要判定<code>evil(x)</code>是否满足P，就可判定停机问题，但是之前已经证明过，停机问题是不可判定问题，因此矛盾。</p>
+<p>注意，将空集描述为满足P，也可以用类似的方法证明（设有不满足P的程序no_prog…）</p>
+<h1 id="可靠性和完备性（soundness-amp-completeness）"><a href="#可靠性和完备性（soundness-amp-completeness）" class="headerlink" title="可靠性和完备性（soundness&amp;completeness）"></a>可靠性和完备性（soundness&amp;completeness）</h1><p>莱斯定理说明了不可判定性，在实际分析时只能做may或者must的分析，分析时出现sound和complete情况，存在两种妥协方案：</p>
+<ul>
+<li>Compromise soundness：妥协可靠性，即接受误报（may），该方案是静态分析较常见</li>
+<li>Compromise completeness：妥协完备性，即接受漏报（must）</li>
 </ul>
 <p>误报（False positive）与漏报（False negative）关系如下图所示：</p>
 <p><img src="/pl-静态程序分析课程笔记（简介）/image-20200802115612020.png" alt="image-20200802115612020"></p>
@@ -387,7 +421,15 @@
 <h2 id="三地址码"><a href="#三地址码" class="headerlink" title="三地址码"></a>三地址码</h2><p>一种常用的IR：</p>
 <ol>
 <li>右侧只有一个操作</li>
-<li>每一语句最多有三个“地址”（变量，常量）</li>
+<li>每一语句最多有三个“地址”（地址可以是变量，常量）<ul>
+<li>$z=x\text{ }op\text{ }y$</li>
+<li>$x=op\text{ }y$</li>
+<li>$x=y$</li>
+<li>$goto\text{ }L$</li>
+<li>$if\text{ }x\text{ }goto\text{ }L$</li>
+<li>$if\text{ }x\text{ }op\text{ }y\text{ }goto\text{ }L$</li>
+</ul>
+</li>
 </ol>
 <p>Soot 中的三地址码:</p>
 <ul>
@@ -505,8 +547,8 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/pl-静态程序分析课程笔记（数据流分析-理论基础）/" rel="prev" title="静态程序分析课程笔记（数据流分析-理论基础）">
-                  静态程序分析课程笔记（数据流分析-理论基础） <i class="fa fa-chevron-right"></i>
+                <a href="/pl-静态程序分析课程笔记（数据流分析-应用）/" rel="prev" title="静态程序分析课程笔记（数据流分析-应用）">
+                  静态程序分析课程笔记（数据流分析-应用） <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
@@ -559,7 +601,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PL知识体系"><span class="nav-number">1.</span> <span class="nav-text">PL知识体系</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rice’s-Theorem（莱斯定理）"><span class="nav-number">2.</span> <span class="nav-text">Rice’s Theorem（莱斯定理）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可靠性和完备性（soundness-amp-completeness）"><span class="nav-number">3.</span> <span class="nav-text">可靠性和完备性（soundness&amp;completeness）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简单的程序分析案例"><span class="nav-number">4.</span> <span class="nav-text">简单的程序分析案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义数据抽象"><span class="nav-number">4.1.</span> <span class="nav-text">定义数据抽象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义Transfer-Function"><span class="nav-number">4.2.</span> <span class="nav-text">定义Transfer Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义Control-Flow-Merge"><span class="nav-number">4.3.</span> <span class="nav-text">定义Control Flow Merge</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译器vs-静态分析器"><span class="nav-number">5.</span> <span class="nav-text">编译器vs.静态分析器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AST和IR"><span class="nav-number">6.</span> <span class="nav-text">AST和IR</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AST"><span class="nav-number">6.1.</span> <span class="nav-text">AST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IR"><span class="nav-number">6.2.</span> <span class="nav-text">IR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三地址码"><span class="nav-number">6.3.</span> <span class="nav-text">三地址码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSA"><span class="nav-number">6.4.</span> <span class="nav-text">SSA</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Control-Flow-Graph"><span class="nav-number">7.</span> <span class="nav-text">Control Flow Graph</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#构造Basic-Blocks"><span class="nav-number">7.1.</span> <span class="nav-text">构造Basic Blocks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造CFG"><span class="nav-number">7.2.</span> <span class="nav-text">构造CFG</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PL知识体系"><span class="nav-number">1.</span> <span class="nav-text">PL知识体系</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rice’s-Theorem（莱斯定理）"><span class="nav-number">2.</span> <span class="nav-text">Rice’s Theorem（莱斯定理）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#停机问题"><span class="nav-number">2.1.</span> <span class="nav-text">停机问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存泄露问题"><span class="nav-number">2.2.</span> <span class="nav-text">内存泄露问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rice定理"><span class="nav-number">2.3.</span> <span class="nav-text">Rice定理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可靠性和完备性（soundness-amp-completeness）"><span class="nav-number">3.</span> <span class="nav-text">可靠性和完备性（soundness&amp;completeness）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简单的程序分析案例"><span class="nav-number">4.</span> <span class="nav-text">简单的程序分析案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义数据抽象"><span class="nav-number">4.1.</span> <span class="nav-text">定义数据抽象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义Transfer-Function"><span class="nav-number">4.2.</span> <span class="nav-text">定义Transfer Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义Control-Flow-Merge"><span class="nav-number">4.3.</span> <span class="nav-text">定义Control Flow Merge</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译器vs-静态分析器"><span class="nav-number">5.</span> <span class="nav-text">编译器vs.静态分析器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AST和IR"><span class="nav-number">6.</span> <span class="nav-text">AST和IR</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AST"><span class="nav-number">6.1.</span> <span class="nav-text">AST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IR"><span class="nav-number">6.2.</span> <span class="nav-text">IR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三地址码"><span class="nav-number">6.3.</span> <span class="nav-text">三地址码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSA"><span class="nav-number">6.4.</span> <span class="nav-text">SSA</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Control-Flow-Graph"><span class="nav-number">7.</span> <span class="nav-text">Control Flow Graph</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#构造Basic-Blocks"><span class="nav-number">7.1.</span> <span class="nav-text">构造Basic Blocks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造CFG"><span class="nav-number">7.2.</span> <span class="nav-text">构造CFG</span></a></li></ol></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -578,7 +620,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -604,7 +646,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -816,7 +858,10 @@
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -76,7 +76,7 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析）/image-20200823104858792.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析）/image-20200823202143283.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（指针分析）/image-20200823204227690.png">
-<meta property="og:updated_time" content="2020-09-10T13:16:08.058Z">
+<meta property="og:updated_time" content="2020-10-04T03:41:48.399Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（指针分析）">
 <meta name="twitter:description" content="MotivationCHA 只看定义类型，会得到很多实际不被调用的子类方法，如下图所示，CHA的常量分析时只能得到NAC而指针分析会得到更精确的对象类型：Introduction to Pointer Analysis A fundamental static analysis, computes which memory locations a pointer can point to. For">
@@ -231,17 +231,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -310,7 +311,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-10 21:16:08" itemprop="dateModified" datetime="2020-09-10T21:16:08+08:00">2020-09-10</time>
+                <time title="修改时间：2020-10-04 11:41:48" itemprop="dateModified" datetime="2020-10-04T11:41:48+08:00">2020-10-04</time>
               </span>
             
           
@@ -439,7 +440,7 @@
 <p>个人认为对于特定的分析（如污点分析）做好函数摘要（summary）后，就可以做上下文不敏感的分析，同时不损失精度。</p>
 <h2 id="流敏感"><a href="#流敏感" class="headerlink" title="流敏感"></a>流敏感</h2><p>做指针分析时，对控制流的处理</p>
 <ul>
-<li>控制流敏感<ul>
+<li>控制流敏感[4]<ul>
 <li>考虑执行顺序</li>
 <li>维护每一程序点的指针指向关系</li>
 </ul>
@@ -732,6 +733,8 @@ Dispatch(c', m), & \text{otherwise}
 <li>William E. Weihl, “Interprocedural Data Flow Analysis in the Presence of Pointers, Procedure Variables, and Label Variables”. POPL 1980.</li>
 <li>Vini Kanvar, Uday P. Khedker, “Heap Abstractions for Static Analysis”. ACM CSUR 2016.</li>
 <li>Lars Ole Andersen, 1994. “Program Analysis and Specialization for the C Programming Language”. Ph.D. Thesis. University of Copenhagen.</li>
+<li>Hardekopf B, Lin C. Flow-sensitive pointer analysis for millions of lines of code. CGO 2011:289-298.</li>
+<li>Lecture Notes on Pointer Analysis, <a href="https://www.cs.cmu.edu/~aldrich/courses/15-819O-13sp/resources/pointer.pdf" target="_blank" rel="noopener">https://www.cs.cmu.edu/~aldrich/courses/15-819O-13sp/resources/pointer.pdf</a></li>
 </ol>
 
     </div>
@@ -861,7 +864,7 @@ Dispatch(c', m), & \text{otherwise}
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -887,7 +890,7 @@ Dispatch(c', m), & \text{otherwise}
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -1099,7 +1102,10 @@ Dispatch(c', m), & \text{otherwise}
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

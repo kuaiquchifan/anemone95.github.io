@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -58,13 +58,13 @@
   };
 </script>
 
-  <meta name="description" content="Iterative Algorithm 对于一个含 $k$ 个节点的CFG，每个迭代算法对于每个node $n$ 更新$\mathrm{OUT}[n]$。  假设迭代算法的研究对象（domain）是$V$，定义一个k元组$V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\right">
+  <meta name="description" content="Iterative Algorithm 对于一个含 $k$ 个节点的CFG，每个迭代算法对于每个node $n$ 更新$\mathrm{OUT}[n]$。  假设迭代算法的研究对象（domain）是$V$，定义一个k元组  V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\righ">
 <meta name="keywords" content="白盒扫描,静态程序分析,数据流分析,PL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="静态程序分析课程笔记（数据流分析-理论基础）">
 <meta property="og:url" content="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/index.html">
 <meta property="og:site_name" content="Anemone&#39;s Blog">
-<meta property="og:description" content="Iterative Algorithm 对于一个含 $k$ 个节点的CFG，每个迭代算法对于每个node $n$ 更新$\mathrm{OUT}[n]$。  假设迭代算法的研究对象（domain）是$V$，定义一个k元组$V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\right">
+<meta property="og:description" content="Iterative Algorithm 对于一个含 $k$ 个节点的CFG，每个迭代算法对于每个node $n$ 更新$\mathrm{OUT}[n]$。  假设迭代算法的研究对象（domain）是$V$，定义一个k元组  V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\righ">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/image-20200804204606009.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/image-20200812205336289.png">
@@ -72,10 +72,10 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/image-20200814215920162.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/image-20200814220329588.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/image-20200815173321586.png">
-<meta property="og:updated_time" content="2020-09-10T13:28:03.358Z">
+<meta property="og:updated_time" content="2020-10-18T04:04:24.629Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（数据流分析-理论基础）">
-<meta name="twitter:description" content="Iterative Algorithm 对于一个含 $k$ 个节点的CFG，每个迭代算法对于每个node $n$ 更新$\mathrm{OUT}[n]$。  假设迭代算法的研究对象（domain）是$V$，定义一个k元组$V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\right">
+<meta name="twitter:description" content="Iterative Algorithm 对于一个含 $k$ 个节点的CFG，每个迭代算法对于每个node $n$ 更新$\mathrm{OUT}[n]$。  假设迭代算法的研究对象（domain）是$V$，定义一个k元组  V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\righ">
 <meta name="twitter:image" content="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/image-20200804204606009.png">
   <link rel="canonical" href="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/">
 
@@ -227,17 +227,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -306,7 +307,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-10 21:28:03" itemprop="dateModified" datetime="2020-09-10T21:28:03+08:00">2020-09-10</time>
+                <time title="修改时间：2020-10-18 12:04:24" itemprop="dateModified" datetime="2020-10-18T12:04:24+08:00">2020-10-18</time>
               </span>
             
           
@@ -346,7 +347,7 @@
         <h1 id="Iterative-Algorithm"><a href="#Iterative-Algorithm" class="headerlink" title="Iterative Algorithm"></a>Iterative Algorithm</h1><ul>
 <li><p>对于一个含 $k$ 个节点的CFG，每个迭代算法对于每个node $n$ 更新$\mathrm{OUT}[n]$。</p>
 </li>
-<li><p>假设迭代算法的研究对象（domain）是$V$，定义一个k元组$V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\right], \ldots, \mathrm{OUT}\left[\mathrm{n}_{\mathrm{k}}\right]\right)$，$V^k\in(V_1 \times V_2 \times \dots \times V_k)$，$V^k$ 即一次迭代产生的输出，每次迭代会更新$V^k$，可以将每次迭代经过transfer functions和control-flow handing的过程抽象为$F: V^k\rightarrow {V^{k}}’$</p>
+<li><p>假设迭代算法的研究对象（domain）是$V$，定义一个k元组<br>  <script type="math/tex">V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\right], \ldots, \mathrm{OUT}\left[\mathrm{n}_{\mathrm{k}}\right]\right)$，$V^k\in(V_1 \times V_2 \times \dots \times V_k)</script>，<br>  $ V^k $ 即一次迭代产生的输出，每次迭代会更新$V^k$，可以将每次迭代经过transfer functions和control-flow handing的过程抽象为$F: V^k\rightarrow {V^{k}}’$</p>
 </li>
 <li><p>当$V^k\rightarrow {V^{k}}’$时，即$X=F(X)$ ，称$F(x)$在$X$处到达了<strong>不动点</strong>，$X$为$F(x)$的不动点，</p>
 </li>
@@ -499,6 +500,11 @@ f(y,z)=\left\{
 <p><img src="/pl-静态程序分析课程笔记（数据流分析-理论基础）/image-20200815173321586.png" alt="image-20200815173321586"></p>
 <h1 id="Worklist-Algorithm"><a href="#Worklist-Algorithm" class="headerlink" title="Worklist Algorithm"></a>Worklist Algorithm</h1><p>Iterative Algorithm的优化，Iterative 存在冗余的计算，而Worklist只计算有变化的node：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">OUT[entry] =∅;</span><br><span class="line"><span class="keyword">for</span>(each basic block B\entry) </span><br><span class="line">	OUT[B] =∅;</span><br><span class="line">    Worklist←all basic blocks</span><br><span class="line">	<span class="keyword">while</span> (Worklist <span class="keyword">is</span> notempty) </span><br><span class="line">    	Pick a basic block B <span class="keyword">from</span> Worklist</span><br><span class="line">		old_OUT= OUT[B]</span><br><span class="line">        IN[B] =⊔OUT[P]; <span class="comment"># join/meet P为B的前置代码块</span></span><br><span class="line">        OUT[B] = genB U (IN[B] - killB); <span class="comment"># transfer function </span></span><br><span class="line">        <span class="keyword">if</span>(old_OUT≠OUT[B])</span><br><span class="line">        	Add all successors of B to Worklis</span><br></pre></td></tr></table></figure>
+<h1 id="分析特性"><a href="#分析特性" class="headerlink" title="分析特性"></a>分析特性</h1><ul>
+<li>流敏感：程序语句随意调换位置，分析结果不变为流非敏感，否则为流敏感；</li>
+<li>路径敏感：考虑程序中路径的可行性；</li>
+<li></li>
+</ul>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本节课主要介绍格，接着用格抽象描述数据流分析，解释为什么迭代算法能够到达最大/最小不动点，接着比较了流敏感和路径敏感的准确性，最后介绍worklist算法，以提升迭代算法的效率。</p>
 
     </div>
@@ -547,8 +553,8 @@ f(y,z)=\left\{
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/pl-静态程序分析课程笔记（简介）/" rel="next" title="静态程序分析课程笔记（简介）">
-                  <i class="fa fa-chevron-left"></i> 静态程序分析课程笔记（简介）
+                <a href="/pl-静态程序分析课程笔记（数据流分析-应用）/" rel="next" title="静态程序分析课程笔记（数据流分析-应用）">
+                  <i class="fa fa-chevron-left"></i> 静态程序分析课程笔记（数据流分析-应用）
                 </a>
               
             </div>
@@ -557,8 +563,8 @@ f(y,z)=\left\{
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/pl-静态程序分析课程笔记（数据流分析-应用）/" rel="prev" title="静态程序分析课程笔记（数据流分析-应用）">
-                  静态程序分析课程笔记（数据流分析-应用） <i class="fa fa-chevron-right"></i>
+                <a href="/pl-静态程序分析课程笔记（过程间分析）/" rel="prev" title="静态程序分析课程笔记（过程间分析）">
+                  静态程序分析课程笔记（过程间分析） <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
@@ -611,7 +617,7 @@ f(y,z)=\left\{
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Iterative-Algorithm"><span class="nav-number">1.</span> <span class="nav-text">Iterative Algorithm</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Poset-amp-partial-order（偏序集和偏序）"><span class="nav-number">2.</span> <span class="nav-text">Poset &amp; partial order（偏序集和偏序）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Uppper-and-Lower-Bounds（上界和下界）"><span class="nav-number">3.</span> <span class="nav-text">Uppper and Lower Bounds（上界和下界）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#最小上界、最大下界"><span class="nav-number">3.1.</span> <span class="nav-text">最小上界、最大下界</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Lattice-Semilattice-Complete-and-Product-Lattice"><span class="nav-number">4.</span> <span class="nav-text">Lattice, Semilattice, Complete and Product Lattice</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Lattice（格）"><span class="nav-number">4.1.</span> <span class="nav-text">Lattice（格）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Semilattice"><span class="nav-number">4.2.</span> <span class="nav-text">Semilattice</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Complete-Lattice，top-amp-bottom（全格，-top-和-perp-）"><span class="nav-number">4.3.</span> <span class="nav-text">Complete Lattice，top &amp; bottom（全格，$\top$ 和 $\perp$）*</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Product-Lattice"><span class="nav-number">4.4.</span> <span class="nav-text">Product Lattice</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Data-Flow-Analysis-Framework-via-Lattice"><span class="nav-number">5.</span> <span class="nav-text">Data Flow Analysis Framework via Lattice</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Monotonicity-and-Fixed-Point-Theorem"><span class="nav-number">6.</span> <span class="nav-text">Monotonicity and Fixed Point Theorem</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Monotonicity（单调性）"><span class="nav-number">6.1.</span> <span class="nav-text">Monotonicity（单调性）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fixed-Point-Theorem"><span class="nav-number">6.2.</span> <span class="nav-text">Fixed-Point Theorem</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Relate-lterative-Algorithm-to-Fixed-Point-Theorem"><span class="nav-number">7.</span> <span class="nav-text">Relate lterative Algorithm to Fixed Point Theorem</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#May-Must-Analysis-A-Lattice-View"><span class="nav-number">8.</span> <span class="nav-text">May/Must Analysis, A Lattice View*</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Distributivity（分配性）-and-MOP"><span class="nav-number">9.</span> <span class="nav-text">Distributivity（分配性） and MOP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MOP（Meet-Over-All-Paths-Solution）"><span class="nav-number">9.1.</span> <span class="nav-text">MOP（Meet-Over-All-Paths Solution）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Iterative-Algorithm-v-s-MOP"><span class="nav-number">9.2.</span> <span class="nav-text">Iterative Algorithm v.s. MOP</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Constant-Propagation"><span class="nav-number">10.</span> <span class="nav-text">Constant Propagation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Lattice"><span class="nav-number">10.1.</span> <span class="nav-text">Lattice</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Transfer-Function"><span class="nav-number">10.2.</span> <span class="nav-text">Transfer Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#function不满足分配性"><span class="nav-number">10.3.</span> <span class="nav-text">function不满足分配性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Worklist-Algorithm"><span class="nav-number">11.</span> <span class="nav-text">Worklist Algorithm</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">12.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Iterative-Algorithm"><span class="nav-number">1.</span> <span class="nav-text">Iterative Algorithm</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Poset-amp-partial-order（偏序集和偏序）"><span class="nav-number">2.</span> <span class="nav-text">Poset &amp; partial order（偏序集和偏序）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Uppper-and-Lower-Bounds（上界和下界）"><span class="nav-number">3.</span> <span class="nav-text">Uppper and Lower Bounds（上界和下界）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#最小上界、最大下界"><span class="nav-number">3.1.</span> <span class="nav-text">最小上界、最大下界</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Lattice-Semilattice-Complete-and-Product-Lattice"><span class="nav-number">4.</span> <span class="nav-text">Lattice, Semilattice, Complete and Product Lattice</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Lattice（格）"><span class="nav-number">4.1.</span> <span class="nav-text">Lattice（格）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Semilattice"><span class="nav-number">4.2.</span> <span class="nav-text">Semilattice</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Complete-Lattice，top-amp-bottom（全格，-top-和-perp-）"><span class="nav-number">4.3.</span> <span class="nav-text">Complete Lattice，top &amp; bottom（全格，$\top$ 和 $\perp$）*</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Product-Lattice"><span class="nav-number">4.4.</span> <span class="nav-text">Product Lattice</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Data-Flow-Analysis-Framework-via-Lattice"><span class="nav-number">5.</span> <span class="nav-text">Data Flow Analysis Framework via Lattice</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Monotonicity-and-Fixed-Point-Theorem"><span class="nav-number">6.</span> <span class="nav-text">Monotonicity and Fixed Point Theorem</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Monotonicity（单调性）"><span class="nav-number">6.1.</span> <span class="nav-text">Monotonicity（单调性）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fixed-Point-Theorem"><span class="nav-number">6.2.</span> <span class="nav-text">Fixed-Point Theorem</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Relate-lterative-Algorithm-to-Fixed-Point-Theorem"><span class="nav-number">7.</span> <span class="nav-text">Relate lterative Algorithm to Fixed Point Theorem</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#May-Must-Analysis-A-Lattice-View"><span class="nav-number">8.</span> <span class="nav-text">May/Must Analysis, A Lattice View*</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Distributivity（分配性）-and-MOP"><span class="nav-number">9.</span> <span class="nav-text">Distributivity（分配性） and MOP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MOP（Meet-Over-All-Paths-Solution）"><span class="nav-number">9.1.</span> <span class="nav-text">MOP（Meet-Over-All-Paths Solution）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Iterative-Algorithm-v-s-MOP"><span class="nav-number">9.2.</span> <span class="nav-text">Iterative Algorithm v.s. MOP</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Constant-Propagation"><span class="nav-number">10.</span> <span class="nav-text">Constant Propagation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Lattice"><span class="nav-number">10.1.</span> <span class="nav-text">Lattice</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Transfer-Function"><span class="nav-number">10.2.</span> <span class="nav-text">Transfer Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#function不满足分配性"><span class="nav-number">10.3.</span> <span class="nav-text">function不满足分配性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Worklist-Algorithm"><span class="nav-number">11.</span> <span class="nav-text">Worklist Algorithm</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分析特性"><span class="nav-number">12.</span> <span class="nav-text">分析特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">13.</span> <span class="nav-text">总结</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -630,7 +636,7 @@ f(y,z)=\left\{
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -656,7 +662,7 @@ f(y,z)=\left\{
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -868,7 +874,10 @@ f(y,z)=\left\{
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -59,7 +59,7 @@
 </script>
 
   <meta name="description" content="写毕设调查背景知识时做的，在t00ls和90sec发过帖子，这里做归档用。词法分析技术词法分析技术是最简单的一类漏洞挖掘技术，其主要思想是将代码文本与归纳好的缺陷模式进行匹配，以此发现漏洞。由于其不深入分析程序结构和语义，往往只能挖掘较为简单的一类漏洞，并且存在相当高的误报率，在实际场景下应用较少，但由于其思想简单，适用性很广，目前也还存在类似工具，如：MobSF，Cobra。">
-<meta name="keywords" content="符号执行,白盒扫描,污点分析,数据流分析,形式化分析">
+<meta name="keywords" content="白盒扫描,数据流分析,污点分析,符号执行,形式化分析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="白盒扫描技术综述">
 <meta property="og:url" content="http://anemone.top/whitebox-白盒扫描技术综述/index.html">
@@ -224,17 +224,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -426,13 +427,13 @@
           
           <div class="post-tags">
             
-              <a href="/tags/符号执行/" rel="tag"># 符号执行</a>
-            
               <a href="/tags/白盒扫描/" rel="tag"># 白盒扫描</a>
+            
+              <a href="/tags/数据流分析/" rel="tag"># 数据流分析</a>
             
               <a href="/tags/污点分析/" rel="tag"># 污点分析</a>
             
-              <a href="/tags/数据流分析/" rel="tag"># 数据流分析</a>
+              <a href="/tags/符号执行/" rel="tag"># 符号执行</a>
             
               <a href="/tags/形式化分析/" rel="tag"># 形式化分析</a>
             
@@ -527,7 +528,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -553,7 +554,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -765,7 +766,10 @@
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

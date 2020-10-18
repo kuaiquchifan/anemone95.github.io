@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -218,17 +218,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -280,7 +281,7 @@
         
          
           
-        <span class="collection-header">不错! 目前共计 67 篇日志。 继续努力。</span>
+        <span class="collection-header">不错! 目前共计 70 篇日志。 继续努力。</span>
       </div>
       
 
@@ -294,6 +295,93 @@
     <div class="collection-year">
       <h2 class="collection-header">2019</h2>
     </div>
+  
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2019-02-10T15:08:35+08:00"
+              content="2019-02-10">
+          02-10
+        </time>
+      </div>
+
+      <h3 class="post-title">
+        
+          <a class="post-title-link" href="/信息收集-信息收集思路整理/" itemprop="url">
+            <span itemprop="name">信息收集思路整理</span>
+          </a>
+        
+      </h3>
+
+    </header>
+  </article>
+
+
+
+  
+  
+
+  
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2019-02-07T15:02:13+08:00"
+              content="2019-02-07">
+          02-07
+        </time>
+      </div>
+
+      <h3 class="post-title">
+        
+          <a class="post-title-link" href="/php-文件包含利用/" itemprop="url">
+            <span itemprop="name">文件包含漏洞利用</span>
+          </a>
+        
+      </h3>
+
+    </header>
+  </article>
+
+
+
+  
+  
+
+  
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2019-02-07T15:02:13+08:00"
+              content="2019-02-07">
+          02-07
+        </time>
+      </div>
+
+      <h3 class="post-title">
+        
+          <a class="post-title-link" href="/php-PHP中的危险函数和伪协议/" itemprop="url">
+            <span itemprop="name">PHP中的危险函数和伪协议</span>
+          </a>
+        
+      </h3>
+
+    </header>
+  </article>
+
+
+
+  
+  
+
   
 
   <article itemscope itemtype="http://schema.org/Article">
@@ -494,93 +582,6 @@
 
 
 
-  
-  
-
-  
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-01-28T20:40:13+08:00"
-              content="2019-01-28">
-          01-28
-        </time>
-      </div>
-
-      <h3 class="post-title">
-        
-          <a class="post-title-link" href="/ctf-2019安恒01月赛babygo（详解）和其他题目wp/" itemprop="url">
-            <span itemprop="name">2019安恒01月赛babygo（详解）和其他题目wp</span>
-          </a>
-        
-      </h3>
-
-    </header>
-  </article>
-
-
-
-  
-  
-
-  
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-01-22T17:44:53+08:00"
-              content="2019-01-22">
-          01-22
-        </time>
-      </div>
-
-      <h3 class="post-title">
-        
-          <a class="post-title-link" href="/xxe-XXE漏洞原理、攻击方式以及防御方法/" itemprop="url">
-            <span itemprop="name">实现包含XXE漏洞的服务、攻击以及防御方法</span>
-          </a>
-        
-      </h3>
-
-    </header>
-  </article>
-
-
-
-  
-  
-
-  
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-01-03T20:51:42+08:00"
-              content="2019-01-03">
-          01-03
-        </time>
-      </div>
-
-      <h3 class="post-title">
-        
-          <a class="post-title-link" href="/组件-redis未授权-弱密码漏洞复现和防护/" itemprop="url">
-            <span itemprop="name">redis未授权&弱密码漏洞复现和防护</span>
-          </a>
-        
-      </h3>
-
-    </header>
-  </article>
-
-
-
 
     </div>
   </div>
@@ -640,7 +641,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -666,7 +667,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -878,7 +879,10 @@
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 

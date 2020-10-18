@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -218,17 +218,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -252,6 +253,346 @@
           <div id="content" class="content">
             
   <div id="posts" class="posts-expand">
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-理论基础）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Anemone">
+      <meta itemprop="description" content="关注Web安全、移动安全、Fuzz测试和机器学习">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Anemone's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+            
+            <a href="/pl-静态程序分析课程笔记（数据流分析-理论基础）/" class="post-title-link" itemprop="url">静态程序分析课程笔记（数据流分析-理论基础）</a>
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-08-02 17:34:13" itemprop="dateCreated datePublished" datetime="2020-08-02T17:34:13+08:00">2020-08-02</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-18 12:04:24" itemprop="dateModified" datetime="2020-10-18T12:04:24+08:00">2020-10-18</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Program-Language/" itemprop="url" rel="index"><span itemprop="name">Program Language</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/pl-静态程序分析课程笔记（数据流分析-理论基础）/" class="post-meta-item leancloud_visitors" data-flag-title="静态程序分析课程笔记（数据流分析-理论基础）" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Iterative-Algorithm"><a href="#Iterative-Algorithm" class="headerlink" title="Iterative Algorithm"></a>Iterative Algorithm</h1><ul>
+<li><p>对于一个含 $k$ 个节点的CFG，每个迭代算法对于每个node $n$ 更新$\mathrm{OUT}[n]$。</p>
+</li>
+<li><p>假设迭代算法的研究对象（domain）是$V$，定义一个k元组<br>  <script type="math/tex">V^k=\left(\mathrm{OUT}\left[\mathrm{n}_{1}\right], \mathrm{OUT}\left[\mathrm{n}_{2}\right], \ldots, \mathrm{OUT}\left[\mathrm{n}_{\mathrm{k}}\right]\right)$，$V^k\in(V_1 \times V_2 \times \dots \times V_k)</script>，<br>  $ V^k $ 即一次迭代产生的输出，每次迭代会更新$V^k$，可以将每次迭代经过transfer functions和control-flow handing的过程抽象为$F: V^k\rightarrow {V^{k}}’$</p>
+</li>
+<li><p>当$V^k\rightarrow {V^{k}}’$时，即$X=F(X)$ ，称$F(x)$在$X$处到达了<strong>不动点</strong>，$X$为$F(x)$的不动点，</p>
+</li>
+</ul>
+          <!--noindex-->
+          
+            <div class="post-button">
+              <a class="btn" href="/pl-静态程序分析课程笔记（数据流分析-理论基础）/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://anemone.top/pl-静态程序分析课程笔记（数据流分析-应用）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Anemone">
+      <meta itemprop="description" content="关注Web安全、移动安全、Fuzz测试和机器学习">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Anemone's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+            
+            <a href="/pl-静态程序分析课程笔记（数据流分析-应用）/" class="post-title-link" itemprop="url">静态程序分析课程笔记（数据流分析-应用）</a>
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-08-02 17:34:13" itemprop="dateCreated datePublished" datetime="2020-08-02T17:34:13+08:00">2020-08-02</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-04 11:34:30" itemprop="dateModified" datetime="2020-10-04T11:34:30+08:00">2020-10-04</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Program-Language/" itemprop="url" rel="index"><span itemprop="name">Program Language</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/pl-静态程序分析课程笔记（数据流分析-应用）/" class="post-meta-item leancloud_visitors" data-flag-title="静态程序分析课程笔记（数据流分析-应用）" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview-amp-Preliminaries"><a href="#Overview-amp-Preliminaries" class="headerlink" title="Overview &amp;  Preliminaries"></a>Overview &amp;  Preliminaries</h1><p>两类分析：</p><ul>
+<li>may Analysis：over-approximation</li>
+<li>must Analysis：under-approximation</li>
+</ul><p>实际上都是为了safety of analysis。</p><h2 id="对数据流分析的几种解释"><a href="#对数据流分析的几种解释" class="headerlink" title="对数据流分析的几种解释"></a>对数据流分析的几种解释</h2>
+          <!--noindex-->
+          
+            <div class="post-button">
+              <a class="btn" href="/pl-静态程序分析课程笔记（数据流分析-应用）/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://anemone.top/pl-静态程序分析课程笔记（简介）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Anemone">
+      <meta itemprop="description" content="关注Web安全、移动安全、Fuzz测试和机器学习">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Anemone's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+            
+            <a href="/pl-静态程序分析课程笔记（简介）/" class="post-title-link" itemprop="url">静态程序分析课程笔记（简介）</a>
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-08-02 16:34:13" itemprop="dateCreated datePublished" datetime="2020-08-02T16:34:13+08:00">2020-08-02</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-03 12:03:43" itemprop="dateModified" datetime="2020-10-03T12:03:43+08:00">2020-10-03</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Program-Language/" itemprop="url" rel="index"><span itemprop="name">Program Language</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/pl-静态程序分析课程笔记（简介）/" class="post-meta-item leancloud_visitors" data-flag-title="静态程序分析课程笔记（简介）" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>母校计算机院的李樾、谭添老师讲的课，听了第一节课就哭了，决定做一下笔记，课程网站 <a href="https://pascal-group.bitbucket.io/teaching.html。" target="_blank" rel="noopener">https://pascal-group.bitbucket.io/teaching.html。</a></p><h1 id="PL知识体系"><a href="#PL知识体系" class="headerlink" title="PL知识体系"></a>PL知识体系</h1><p><img src="/pl-静态程序分析课程笔记（简介）/image-20200802113608162.png" alt="image-20200802113608162"></p><p>如上图所示，主要分三大块，理论部分包含语言设计、类型系统、语义和逻辑检查；环境部分包含编译器和运行时设计等；应用部分包含程序分析、程序验证和程序生成等，本课程主要关注于应用方面的程序分析。</p>
+          <!--noindex-->
+          
+            <div class="post-button">
+              <a class="btn" href="/pl-静态程序分析课程笔记（简介）/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
         <article itemscope itemtype="http://schema.org/Article">
   
   
@@ -1022,342 +1363,6 @@
   </article>
 
     
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://anemone.top/vulnresearch-Shrio1.4.0PaddingOracle导致反序列化/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Anemone">
-      <meta itemprop="description" content="关注Web安全、移动安全、Fuzz测试和机器学习">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Anemone's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-            
-            <a href="/vulnresearch-Shrio1.4.0PaddingOracle导致反序列化/" class="post-title-link" itemprop="url">Shiro v1.4.0反序列化</a>
-          
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2019-11-25 15:15:43" itemprop="dateCreated datePublished" datetime="2019-11-25T15:15:43+08:00">2019-11-25</time>
-            </span>
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-03-21 16:11:52" itemprop="dateModified" datetime="2020-03-21T16:11:52+08:00">2020-03-21</time>
-              </span>
-            
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/漏洞分析/" itemprop="url" rel="index"><span itemprop="name">漏洞分析</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span id="/vulnresearch-Shrio1.4.0PaddingOracle导致反序列化/" class="post-meta-item leancloud_visitors" data-flag-title="Shiro v1.4.0反序列化" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>shiro1.2.5后秘钥不再硬编码，但是采用CBC加密会产生padding  oracle攻击，又因为java序列化结构体后可以加垃圾字符，所以攻击能够成功</p><h1 id="解密时的调用链"><a href="#解密时的调用链" class="headerlink" title="解密时的调用链"></a>解密时的调用链</h1><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">org.apache.shiro.mgt.AbstractRememberMeManager#convertBytesToPrincipals // 不论哪个异常都会返回null，上层302跳转</span><br><span class="line">  org.apache.shiro.mgt.AbstractRememberMeManager#decrypt</span><br><span class="line">    org.apache.shiro.crypto.JcaCipherService#decrypt(byte[], byte[])</span><br><span class="line">      org.apache.shiro.crypto.JcaCipherService#decrypt(byte[] encrypted, byte[] key, byte[] iv)</span><br><span class="line">        org.apache.shiro.crypto.JcaCipherService#crypt(byte[] encrypted, byte[] key, byte[] iv, int MODE):</span><br><span class="line">          org.apache.shiro.crypto.JcaCipherService#crypt(javax.crypto.Cipher, byte[] encrypted):459 //throw Unable to execute 'doFinal' with cipher instance</span><br><span class="line">            javax.crypto.Cipher#doFinal(byte[] encrypted)  //this=(key+iv+mode) // jce.jar包 调试直接在这下断点</span><br><span class="line">              com.sun.crypto.provider.AESCipher#engineDoFinal(byte[] encrypted, startIdx, len)</span><br><span class="line">                com.sun.crypto.provider.CipherCore#doFinal(byte[] encrypted, startIdx, len)</span><br><span class="line">                  com.sun.crypto.provider.CipherCore#fillOutputBuffer(encrypted, startIdx, iv, startIdx, len, encrypted)</span><br><span class="line">                    com.sun.crypto.provider.CipherCore#unpad(len, decrypted)</span><br><span class="line">                      com.sun.crypto.provider.PKCS5Padding#unpad(decrypted, startIdx, len)  // throw BadPaddingException</span><br><span class="line">  org.apache.shiro.mgt.AbstractRememberMeManager#deserialize(serialized)</span><br><span class="line">    org.apache.shiro.io.DefaultSerializer#deserialize(serialized) // invalid stream header</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          
-            <div class="post-button">
-              <a class="btn" href="/vulnresearch-Shrio1.4.0PaddingOracle导致反序列化/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://anemone.top/container-Clair初探/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Anemone">
-      <meta itemprop="description" content="关注Web安全、移动安全、Fuzz测试和机器学习">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Anemone's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-            
-            <a href="/container-Clair初探/" class="post-title-link" itemprop="url">Clair初探</a>
-          
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2019-11-16 16:12:49" itemprop="dateCreated datePublished" datetime="2019-11-16T16:12:49+08:00">2019-11-16</time>
-            </span>
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-24 15:58:54" itemprop="dateModified" datetime="2019-11-24T15:58:54+08:00">2019-11-24</time>
-              </span>
-            
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/container/" itemprop="url" rel="index"><span itemprop="name">container</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span id="/container-Clair初探/" class="post-meta-item leancloud_visitors" data-flag-title="Clair初探" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Clair简介"><a href="#Clair简介" class="headerlink" title="Clair简介"></a>Clair简介</h1><p>clair是CoreOS公司开源的一套针对容器安全性检测工具，主要用于发掘容器中使用的组件是否存在安全性问题。</p><p>GitHub项目地址： <a href="https://github.com/quay/clair" target="_blank" rel="noopener">https://github.com/quay/clair</a> </p><h1 id="Clair-Framework"><a href="#Clair-Framework" class="headerlink" title="Clair Framework"></a>Clair Framework</h1><h2 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h2><ul>
-<li>Ancestry——表示容器</li>
-<li>Feature——容器中任何具有脆弱性的实体，如软件包和文件</li>
-<li>Feature Namespace——Feature所在的上下文，如操作系统和编程语言</li>
-<li>Vulnerability Source——Clair中用来跟踪上有漏洞数据库（如CVE）的组件</li>
-<li>Vulnerability Metadata Source——漏洞元数据，用来关联上游漏洞数据和Clair数据库</li>
-</ul>
-          <!--noindex-->
-          
-            <div class="post-button">
-              <a class="btn" href="/container-Clair初探/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://anemone.top/vulnresearch-Solr_Velocity_injection/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Anemone">
-      <meta itemprop="description" content="关注Web安全、移动安全、Fuzz测试和机器学习">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Anemone's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-            
-            <a href="/vulnresearch-Solr_Velocity_injection/" class="post-title-link" itemprop="url">Solr Velocity模板注入漏洞分析</a>
-          
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2019-11-03 20:30:49" itemprop="dateCreated datePublished" datetime="2019-11-03T20:30:49+08:00">2019-11-03</time>
-            </span>
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-12-08 20:57:03" itemprop="dateModified" datetime="2019-12-08T20:57:03+08:00">2019-12-08</time>
-              </span>
-            
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/漏洞分析/" itemprop="url" rel="index"><span itemprop="name">漏洞分析</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span id="/vulnresearch-Solr_Velocity_injection/" class="post-meta-item leancloud_visitors" data-flag-title="Solr Velocity模板注入漏洞分析" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><p>下载受影响版本的solr，这里依然选择v8.1.0，这里注意除了添加solr的jar还需要添加velocity的（源码的化可以让IDEA从maven上下源码）：</p><p><img src="/vulnresearch-Solr_Velocity_injection/image-20191124205421987.png" alt="image-20191124205421987"></p><p>同样的方法启动项目</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">anemone@ANEMONE-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-8.1.0</span><br><span class="line">$ <span class="built_in">cd</span> server/ <span class="comment">#一定要在server下运行</span></span><br><span class="line">anemone@ANEMONE-ASUS:/mnt/d/Store/document/all_my_work/solr/solr-8.1.0/server</span><br><span class="line">$ java <span class="string">"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9000"</span> -Dsolr.solr.home=<span class="string">"../example/example-DIH/solr/"</span> -jar start.jar --module=http</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          
-            <div class="post-button">
-              <a class="btn" href="/vulnresearch-Solr_Velocity_injection/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
   </div>
 
   
@@ -1411,7 +1416,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1437,7 +1442,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -1649,7 +1654,10 @@
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 
@@ -1682,13 +1690,13 @@ if (document.querySelectorAll('pre.mermaid').length) {
   
     
       
-    
-      
-    
-      
-    
-      
         
+      
+    
+      
+    
+      
+    
       
     
       

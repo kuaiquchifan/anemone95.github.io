@@ -40,13 +40,13 @@
     lazyload: false,
     pangu: false,
     algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
+      appID: 'GB90MXPJ1C',
+      apiKey: '05d808da3baf50ac2f2fad2dc3a3cd8f',
+      indexName: 'dev_blog',
+      hits: {"per_page":20},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},
     path: 'search.xml',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -78,7 +78,7 @@
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（Datalog）/image-20200906212109286.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（Datalog）/image-20200907211233439.png">
 <meta property="og:image" content="http://anemone.top/pl-静态程序分析课程笔记（Datalog）/image-20200907211324230.png">
-<meta property="og:updated_time" content="2020-09-09T12:48:20.594Z">
+<meta property="og:updated_time" content="2020-10-02T12:59:57.729Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="静态程序分析课程笔记（Datalog）">
 <meta name="twitter:description" content="先前的分析算法虽然展示了分析细节，但是过于复杂难以实现，本课将介绍一种一种声明式语言（Datalog）以数据驱动推导的方式做指针分析和污点分析MotivationImperative vs DeclarativeImperative（命令式）语言主要有Java、C/C++等，展示了详细的实现细节；">
@@ -233,17 +233,18 @@
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
+  <div class="search-input" id="search-input"></div>
   <span class="popup-btn-close">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
 
+  
 </div>
 <div class="search-pop-overlay"></div>
 
@@ -312,7 +313,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-09 20:48:20" itemprop="dateModified" datetime="2020-09-09T20:48:20+08:00">2020-09-09</time>
+                <time title="修改时间：2020-10-02 20:59:57" itemprop="dateModified" datetime="2020-10-02T20:59:57+08:00">2020-10-02</time>
               </span>
             
           
@@ -558,6 +559,12 @@
 <p>n表示任意一个参数，<code>Taint(_,t)</code>用于保证参数传入了一个污点数据。</p>
 </li>
 </ul>
+<h1 id="数据流分析"><a href="#数据流分析" class="headerlink" title="数据流分析"></a>数据流分析</h1><p>设V为节点，D表示集合中元素</p>
+<ul>
+<li>data(V,D) &lt;- gen(V,D)</li>
+<li>data(V,D) &lt;- edge(V’, V), date(V’, D),  !kill(V, D) # 注意一定要防止矛盾</li>
+<li>data(entry,d)</li>
+</ul>
 <h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>Datalog作为新兴的程序分析模型，有如下优点：</p>
 <ol>
 <li>分析实现简单；</li>
@@ -566,7 +573,7 @@
 </ol>
 <p>然而它的优点也正是它的缺点：</p>
 <ol>
-<li>限制表达，没法表达特殊情况，如先前的gen-kill，以为datalog只能递增，又例如datalog很难表达所有条件都满足的情况（只能一个一个加）；</li>
+<li>限制表达，没法表达特殊情况，如先前的gen-kill，datalog只能递增，又例如datalog很难表达所有条件都满足的情况（只能一个一个加）；</li>
 <li>效率严重依赖引擎，无法完全控制引擎性能。</li>
 </ol>
 <p>个人感觉Datalog很像目前流行的LGTM思路，但是确实感觉表达不是很自由，然而它被很多大佬认为是未来主流的程序分析框架，还是值得学习的。</p>
@@ -686,7 +693,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Motivation"><span class="nav-number">1.</span> <span class="nav-text">Motivation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Imperative-vs-Declarative"><span class="nav-number">1.1.</span> <span class="nav-text">Imperative vs Declarative</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction-to-Datalog"><span class="nav-number">2.</span> <span class="nav-text">Introduction to Datalog</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Data"><span class="nav-number">2.1.</span> <span class="nav-text">Data</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Predicates"><span class="nav-number">2.1.1.</span> <span class="nav-text">Predicates</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Atoms"><span class="nav-number">2.1.2.</span> <span class="nav-text">Atoms</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logic"><span class="nav-number">2.2.</span> <span class="nav-text">Logic</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Rules"><span class="nav-number">2.2.1.</span> <span class="nav-text">Rules</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EDB和IDB"><span class="nav-number">2.2.2.</span> <span class="nav-text">EDB和IDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Logical-Or"><span class="nav-number">2.2.3.</span> <span class="nav-text">Logical Or</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Negation"><span class="nav-number">2.2.4.</span> <span class="nav-text">Negation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Recursion"><span class="nav-number">2.2.5.</span> <span class="nav-text">Recursion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rule-Safety"><span class="nav-number">2.2.6.</span> <span class="nav-text">Rule Safety</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Recursion-and-Negation"><span class="nav-number">2.2.7.</span> <span class="nav-text">Recursion and Negation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Excution"><span class="nav-number">2.3.</span> <span class="nav-text">Excution</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pointer-Analysis-via-Datalog"><span class="nav-number">3.</span> <span class="nav-text">Pointer Analysis via Datalog</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Datalog-Model"><span class="nav-number">3.1.</span> <span class="nav-text">Datalog Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rules-1"><span class="nav-number">3.2.</span> <span class="nav-text">Rules</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Handle-Method-Calls"><span class="nav-number">3.3.</span> <span class="nav-text">Handle Method Calls</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Taint-Analysis-via-Datalog"><span class="nav-number">4.</span> <span class="nav-text">Taint Analysis via Datalog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Conclusion"><span class="nav-number">5.</span> <span class="nav-text">Conclusion</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">6.</span> <span class="nav-text">References</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Motivation"><span class="nav-number">1.</span> <span class="nav-text">Motivation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Imperative-vs-Declarative"><span class="nav-number">1.1.</span> <span class="nav-text">Imperative vs Declarative</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction-to-Datalog"><span class="nav-number">2.</span> <span class="nav-text">Introduction to Datalog</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Data"><span class="nav-number">2.1.</span> <span class="nav-text">Data</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Predicates"><span class="nav-number">2.1.1.</span> <span class="nav-text">Predicates</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Atoms"><span class="nav-number">2.1.2.</span> <span class="nav-text">Atoms</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logic"><span class="nav-number">2.2.</span> <span class="nav-text">Logic</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Rules"><span class="nav-number">2.2.1.</span> <span class="nav-text">Rules</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EDB和IDB"><span class="nav-number">2.2.2.</span> <span class="nav-text">EDB和IDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Logical-Or"><span class="nav-number">2.2.3.</span> <span class="nav-text">Logical Or</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Negation"><span class="nav-number">2.2.4.</span> <span class="nav-text">Negation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Recursion"><span class="nav-number">2.2.5.</span> <span class="nav-text">Recursion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rule-Safety"><span class="nav-number">2.2.6.</span> <span class="nav-text">Rule Safety</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Recursion-and-Negation"><span class="nav-number">2.2.7.</span> <span class="nav-text">Recursion and Negation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Excution"><span class="nav-number">2.3.</span> <span class="nav-text">Excution</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pointer-Analysis-via-Datalog"><span class="nav-number">3.</span> <span class="nav-text">Pointer Analysis via Datalog</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Datalog-Model"><span class="nav-number">3.1.</span> <span class="nav-text">Datalog Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rules-1"><span class="nav-number">3.2.</span> <span class="nav-text">Rules</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Handle-Method-Calls"><span class="nav-number">3.3.</span> <span class="nav-text">Handle Method Calls</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Taint-Analysis-via-Datalog"><span class="nav-number">4.</span> <span class="nav-text">Taint Analysis via Datalog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据流分析"><span class="nav-number">5.</span> <span class="nav-text">数据流分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Conclusion"><span class="nav-number">6.</span> <span class="nav-text">Conclusion</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">7.</span> <span class="nav-text">References</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -705,7 +712,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -731,7 +738,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">83</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -943,7 +950,10 @@
 
 
 
-  <script src="/js/local-search.js?v=7.4.0"></script>
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.css">
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@2/dist/instantsearch.min.js"></script><script src="/js/algolia-search.js?v=7.4.0"></script>
+
 
 
 
