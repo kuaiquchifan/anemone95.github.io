@@ -48,7 +48,10 @@ window.addEventListener('DOMContentLoaded', () => {
       templates  : {
         item: data => {
           let link = data.permalink ? data.permalink : CONFIG.root + data.path;
-          return `<a href="${link}" class="algolia-hit-item-link">${data._highlightResult.title.value}</a>`;
+          title=data._highlightResult.title.value.replace("<em>","<b style=\"color: #f00;\" >").replace("</em>","</b>");;
+          body=data._highlightResult.excerptStrip.value.includes("<em>")? data._highlightResult.excerptStrip.value.replace("<em>","<b style=\"border-bottom: 1px dashed #f00; font-weight: bold; color: #f00;\" >").replace("</em>","</b>"):data._highlightResult.excerptStrip.value.substr(0,200);
+          // FIXME
+          return `<a href="${link}" style="font-weight: bold; border-bottom: 1px solid #999; display:list-item;">${title}</a><a href="${link}"><p style="border-bottom: 1px dashed #ccc; padding: 5px 0;">${body}<p></a>`;
         },
         empty: data => {
           return `<div id="algolia-hits-empty">
